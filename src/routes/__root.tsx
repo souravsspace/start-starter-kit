@@ -117,9 +117,12 @@ function RootDocument({ children }: { children: React.ReactNode }) {
           <HeadContent />
         </head>
         <body>
-          <Header />
           <Toaster />
-          {children}
+
+          <main className="min-h-dvh flex flex-col">
+            <Header />
+            <div className="flex-1">{children}</div>
+          </main>
           <TanstackDevtools
             config={{
               position: "bottom-left",

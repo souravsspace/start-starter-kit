@@ -16,14 +16,15 @@ import { requireMutationCtx } from "@convex-dev/better-auth/utils";
 import { components, internal } from "./_generated/api";
 import betterAuthSchema from "./betterAuth/schema";
 import { DataModel, Id } from "./_generated/dataModel";
-import { asyncMap } from "convex-helpers";
+import { query, QueryCtx } from "./_generated/server";
+import { asyncMap, withoutSystemFields } from "convex-helpers";
 
 // This implementation is upgraded to 0.8 Local Install with no
 // database migration required. It continues the pattern of writing
 // userId to the Better Auth users table and maintaining a separate
 // users table for application data.
 
-const siteUrl = process.env.SITE_URL;
+const siteUrl = process.env.SITE_URL || process.env.VITE_SITE_URL;
 
 const authFunctions: AuthFunctions = internal.auth;
 
@@ -149,4 +150,33 @@ export const createAuth = (
     ],
   });
 
-export const auth = createAuth;
+// Below are example functions for getting the current user
+// Feel free to edit, omit, etc.
+export const safeGetUser = async (ctx: QueryCtx) => {
+  const authUser = await authComponent.safeGetAuthUser(ctx);
+  if (!authUser) {
+    return;
+  }
+  const user = await ctx.db.get(authUser.userId as Id<"users">);
+  if (!user) {
+    return;
+  }
+  return { ...user, ...withoutSystemFields(authUser) };
+};
+
+export const getUser = async (ctx: QueryCtx) => {
+  const user = await safeGetUser(ctx);
+  if (!user) {
+    throw new Error("User not found");
+  }
+  return user;
+};
+
+export const getCurrentUser = query({
+  args: {},
+  handler: async (ctx) => {
+    return safeGetUser(ctx);
+  },
+});
+
+export { createAuth as auth };

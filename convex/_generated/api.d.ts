@@ -9,6 +9,7 @@
  */
 
 import type * as auth from "../auth.js";
+import type * as betterAuth_adapter from "../betterAuth/adapter.js";
 import type * as betterAuth_auth from "../betterAuth/auth.js";
 import type * as emails_components_BaseEmail from "../emails/components/BaseEmail.js";
 import type * as emails_magicLink from "../emails/magicLink.js";
@@ -18,6 +19,7 @@ import type * as emails_verifyOTP from "../emails/verifyOTP.js";
 import type * as emails from "../emails.js";
 import type * as http from "../http.js";
 import type * as products from "../products.js";
+import type * as todos from "../todos.js";
 
 import type {
   ApiFromModules,
@@ -35,6 +37,7 @@ import type {
  */
 declare const fullApi: ApiFromModules<{
   auth: typeof auth;
+  "betterAuth/adapter": typeof betterAuth_adapter;
   "betterAuth/auth": typeof betterAuth_auth;
   "emails/components/BaseEmail": typeof emails_components_BaseEmail;
   "emails/magicLink": typeof emails_magicLink;
@@ -44,6 +47,7 @@ declare const fullApi: ApiFromModules<{
   emails: typeof emails;
   http: typeof http;
   products: typeof products;
+  todos: typeof todos;
 }>;
 declare const fullApiWithMounts: typeof fullApi;
 

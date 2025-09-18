@@ -13,7 +13,7 @@ import {
   FormMessage,
 } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
-import { signIn } from "@/integrations/better-auth/client";
+import { signUp } from "@/integrations/better-auth/client";
 import { useState } from "react";
 import { toast } from "sonner";
 import { appConfig } from "@/app-config";
@@ -50,7 +50,8 @@ function RouteComponent() {
   const onSubmit = async (data: TRegisterSchema) => {
     try {
       setIsSubmitting(true);
-      await signIn.email({
+      await signUp.email({
+        name: `${data.firstname} ${data.lastname}`,
         email: data.email,
         password: data.password,
       });
@@ -181,6 +182,7 @@ function RouteComponent() {
                     </FormLabel>
                     <FormControl>
                       <Input
+                        type="password"
                         placeholder="********"
                         {...field}
                         disabled={isLoading}

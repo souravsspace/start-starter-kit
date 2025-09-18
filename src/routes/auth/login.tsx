@@ -140,6 +140,7 @@ function RouteComponent() {
                       <Input
                         placeholder="********"
                         {...field}
+                        type="password"
                         disabled={isLoading}
                       />
                     </FormControl>

@@ -1,45 +1,152 @@
-import { createClient, type GenericCtx } from "@convex-dev/better-auth";
-import { convex } from "@convex-dev/better-auth/plugins";
-import { components } from "./_generated/api";
-import { DataModel } from "./_generated/dataModel";
-import { query } from "./_generated/server";
 import { betterAuth } from "better-auth";
+import {
+  AuthFunctions,
+  createClient,
+  GenericCtx,
+} from "@convex-dev/better-auth";
+import { anonymous, emailOTP, magicLink, twoFactor } from "better-auth/plugins";
+import { convex } from "@convex-dev/better-auth/plugins";
+import {
+  sendEmailVerification,
+  sendMagicLink,
+  sendOTPVerification,
+  sendResetPassword,
+} from "./emails";
+import { requireMutationCtx } from "@convex-dev/better-auth/utils";
+import { components, internal } from "./_generated/api";
+import betterAuthSchema from "./betterAuth/schema";
+import { DataModel, Id } from "./_generated/dataModel";
+import { asyncMap } from "convex-helpers";
 
-const siteUrl = process.env.SITE_URL!;
+// This implementation is upgraded to 0.8 Local Install with no
+// database migration required. It continues the pattern of writing
+// userId to the Better Auth users table and maintaining a separate
+// users table for application data.
 
-// The component client has methods needed for integrating Convex with Better Auth,
-// as well as helper methods for general use.
-export const authComponent = createClient<DataModel>(components.betterAuth);
+const siteUrl = process.env.SITE_URL;
+
+const authFunctions: AuthFunctions = internal.auth;
+
+export const authComponent = createClient<DataModel, typeof betterAuthSchema>(
+  components.betterAuth,
+  {
+    authFunctions,
+    local: {
+      schema: betterAuthSchema,
+    },
+    verbose: false,
+    triggers: {
+      user: {
+        onCreate: async (ctx, authUser) => {
+          const userId = await ctx.db.insert("users", {
+            email: authUser.email,
+          });
+          await authComponent.setUserId(ctx, authUser._id, userId);
+        },
+        onUpdate: async (ctx, oldUser, newUser) => {
+          if (oldUser.email === newUser.email) {
+            return;
+          }
+          await ctx.db.patch(newUser.userId as Id<"users">, {
+            email: newUser.email,
+          });
+        },
+        onDelete: async (ctx, authUser) => {
+          const user = await ctx.db.get(authUser.userId as Id<"users">);
+          if (!user) {
+            return;
+          }
+          const todos = await ctx.db
+            .query("todos")
+            .withIndex("userId", (q) => q.eq("userId", user._id))
+            .collect();
+          await asyncMap(todos, async (todo) => {
+            await ctx.db.delete(todo._id);
+          });
+          await ctx.db.delete(user._id);
+        },
+      },
+    },
+  },
+);
+
+export const { onCreate, onUpdate, onDelete } = authComponent.triggersApi();
 
 export const createAuth = (
   ctx: GenericCtx<DataModel>,
   { optionsOnly } = { optionsOnly: false },
-) => {
-  return betterAuth({
-    // disable logging when createAuth is called just to generate options.
-    // this is not required, but there's a lot of noise in logs without it.
+) =>
+  betterAuth({
+    baseURL: siteUrl,
     logger: {
       disabled: optionsOnly,
     },
-    baseURL: siteUrl,
     database: authComponent.adapter(ctx),
-    // Configure simple, non-verified email/password to get started
+    account: {
+      accountLinking: {
+        enabled: true,
+      },
+    },
+    emailVerification: {
+      sendVerificationEmail: async ({ user, url }) => {
+        await sendEmailVerification(requireMutationCtx(ctx), {
+          to: user.email,
+          url,
+        });
+      },
+    },
     emailAndPassword: {
       enabled: true,
       requireEmailVerification: false,
+      sendResetPassword: async ({ user, url }) => {
+        await sendResetPassword(requireMutationCtx(ctx), {
+          to: user.email,
+          url,
+        });
+      },
+    },
+    socialProviders: {
+      github: {
+        clientId: process.env.GITHUB_CLIENT_ID as string,
+        clientSecret: process.env.GITHUB_CLIENT_SECRET as string,
+      },
+      google: {
+        clientId: process.env.GOOGLE_CLIENT_ID as string,
+        clientSecret: process.env.GOOGLE_CLIENT_SECRET as string,
+      },
+    },
+    user: {
+      deleteUser: {
+        enabled: true,
+      },
+      additionalFields: {
+        foo: {
+          type: "string",
+          required: false,
+        },
+      },
     },
     plugins: [
-      // The Convex plugin is required for Convex compatibility
+      magicLink({
+        sendMagicLink: async ({ email, url }) => {
+          await sendMagicLink(requireMutationCtx(ctx), {
+            to: email,
+            url,
+          });
+        },
+      }),
+      emailOTP({
+        async sendVerificationOTP({ email, otp }) {
+          await sendOTPVerification(requireMutationCtx(ctx), {
+            to: email,
+            code: otp,
+          });
+        },
+      }),
+      twoFactor(),
+      anonymous(),
       convex(),
     ],
   });
-};
 
-// Example function for getting the current user
-// Feel free to edit, omit, etc.
-export const getCurrentUser = query({
-  args: {},
-  handler: async (ctx) => {
-    return authComponent.getAuthUser(ctx);
-  },
-});
+export const auth = createAuth;

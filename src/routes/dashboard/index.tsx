@@ -1,7 +1,7 @@
 import { useSession } from "@/integrations/better-auth/client";
 import { createFileRoute } from "@tanstack/react-router";
 
-export const Route = createFileRoute("/demo/dashboard")({
+export const Route = createFileRoute("/dashboard/")({
   component: RouteComponent,
 });
 

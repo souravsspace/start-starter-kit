@@ -9,6 +9,13 @@
  */
 
 import type * as auth from "../auth.js";
+import type * as betterAuth_auth from "../betterAuth/auth.js";
+import type * as emails_components_BaseEmail from "../emails/components/BaseEmail.js";
+import type * as emails_magicLink from "../emails/magicLink.js";
+import type * as emails_resetPassword from "../emails/resetPassword.js";
+import type * as emails_verifyEmail from "../emails/verifyEmail.js";
+import type * as emails_verifyOTP from "../emails/verifyOTP.js";
+import type * as emails from "../emails.js";
 import type * as http from "../http.js";
 import type * as products from "../products.js";
 
@@ -28,6 +35,13 @@ import type {
  */
 declare const fullApi: ApiFromModules<{
   auth: typeof auth;
+  "betterAuth/auth": typeof betterAuth_auth;
+  "emails/components/BaseEmail": typeof emails_components_BaseEmail;
+  "emails/magicLink": typeof emails_magicLink;
+  "emails/resetPassword": typeof emails_resetPassword;
+  "emails/verifyEmail": typeof emails_verifyEmail;
+  "emails/verifyOTP": typeof emails_verifyOTP;
+  emails: typeof emails;
   http: typeof http;
   products: typeof products;
 }>;
@@ -5309,6 +5323,135 @@ export declare const components: {
               };
         },
         any
+      >;
+    };
+  };
+  resend: {
+    lib: {
+      cancelEmail: FunctionReference<
+        "mutation",
+        "internal",
+        { emailId: string },
+        null
+      >;
+      cleanupAbandonedEmails: FunctionReference<
+        "mutation",
+        "internal",
+        { olderThan?: number },
+        null
+      >;
+      cleanupOldEmails: FunctionReference<
+        "mutation",
+        "internal",
+        { olderThan?: number },
+        null
+      >;
+      createManualEmail: FunctionReference<
+        "mutation",
+        "internal",
+        {
+          from: string;
+          headers?: Array<{ name: string; value: string }>;
+          replyTo?: Array<string>;
+          subject: string;
+          to: string;
+        },
+        string
+      >;
+      get: FunctionReference<
+        "query",
+        "internal",
+        { emailId: string },
+        {
+          complained: boolean;
+          createdAt: number;
+          errorMessage?: string;
+          finalizedAt: number;
+          from: string;
+          headers?: Array<{ name: string; value: string }>;
+          html?: string;
+          opened: boolean;
+          replyTo: Array<string>;
+          resendId?: string;
+          segment: number;
+          status:
+            | "waiting"
+            | "queued"
+            | "cancelled"
+            | "sent"
+            | "delivered"
+            | "delivery_delayed"
+            | "bounced"
+            | "failed";
+          subject: string;
+          text?: string;
+          to: string;
+        } | null
+      >;
+      getStatus: FunctionReference<
+        "query",
+        "internal",
+        { emailId: string },
+        {
+          complained: boolean;
+          errorMessage: string | null;
+          opened: boolean;
+          status:
+            | "waiting"
+            | "queued"
+            | "cancelled"
+            | "sent"
+            | "delivered"
+            | "delivery_delayed"
+            | "bounced"
+            | "failed";
+        } | null
+      >;
+      handleEmailEvent: FunctionReference<
+        "mutation",
+        "internal",
+        { event: any },
+        null
+      >;
+      sendEmail: FunctionReference<
+        "mutation",
+        "internal",
+        {
+          from: string;
+          headers?: Array<{ name: string; value: string }>;
+          html?: string;
+          options: {
+            apiKey: string;
+            initialBackoffMs: number;
+            onEmailEvent?: { fnHandle: string };
+            retryAttempts: number;
+            testMode: boolean;
+          };
+          replyTo?: Array<string>;
+          subject: string;
+          text?: string;
+          to: string;
+        },
+        string
+      >;
+      updateManualEmail: FunctionReference<
+        "mutation",
+        "internal",
+        {
+          emailId: string;
+          errorMessage?: string;
+          resendId?: string;
+          status:
+            | "waiting"
+            | "queued"
+            | "cancelled"
+            | "sent"
+            | "delivered"
+            | "delivery_delayed"
+            | "bounced"
+            | "failed";
+        },
+        null
       >;
     };
   };

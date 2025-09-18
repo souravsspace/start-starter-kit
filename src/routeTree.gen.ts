@@ -12,7 +12,7 @@ import { createServerRootRoute } from '@tanstack/react-start/server'
 
 import { Route as rootRouteImport } from './routes/__root'
 import { Route as IndexRouteImport } from './routes/index'
-import { Route as DemoDashboardRouteImport } from './routes/demo.dashboard'
+import { Route as DashboardIndexRouteImport } from './routes/dashboard/index'
 import { Route as DemoConvexRouteImport } from './routes/demo.convex'
 import { Route as AuthRegisterRouteImport } from './routes/auth/register'
 import { Route as AuthLoginRouteImport } from './routes/auth/login'
@@ -25,9 +25,9 @@ const IndexRoute = IndexRouteImport.update({
   path: '/',
   getParentRoute: () => rootRouteImport,
 } as any)
-const DemoDashboardRoute = DemoDashboardRouteImport.update({
-  id: '/demo/dashboard',
-  path: '/demo/dashboard',
+const DashboardIndexRoute = DashboardIndexRouteImport.update({
+  id: '/dashboard/',
+  path: '/dashboard/',
   getParentRoute: () => rootRouteImport,
 } as any)
 const DemoConvexRoute = DemoConvexRouteImport.update({
@@ -56,14 +56,14 @@ export interface FileRoutesByFullPath {
   '/auth/login': typeof AuthLoginRoute
   '/auth/register': typeof AuthRegisterRoute
   '/demo/convex': typeof DemoConvexRoute
-  '/demo/dashboard': typeof DemoDashboardRoute
+  '/dashboard': typeof DashboardIndexRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/auth/login': typeof AuthLoginRoute
   '/auth/register': typeof AuthRegisterRoute
   '/demo/convex': typeof DemoConvexRoute
-  '/demo/dashboard': typeof DemoDashboardRoute
+  '/dashboard': typeof DashboardIndexRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
@@ -71,7 +71,7 @@ export interface FileRoutesById {
   '/auth/login': typeof AuthLoginRoute
   '/auth/register': typeof AuthRegisterRoute
   '/demo/convex': typeof DemoConvexRoute
-  '/demo/dashboard': typeof DemoDashboardRoute
+  '/dashboard/': typeof DashboardIndexRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
@@ -80,21 +80,16 @@ export interface FileRouteTypes {
     | '/auth/login'
     | '/auth/register'
     | '/demo/convex'
-    | '/demo/dashboard'
+    | '/dashboard'
   fileRoutesByTo: FileRoutesByTo
-  to:
-    | '/'
-    | '/auth/login'
-    | '/auth/register'
-    | '/demo/convex'
-    | '/demo/dashboard'
+  to: '/' | '/auth/login' | '/auth/register' | '/demo/convex' | '/dashboard'
   id:
     | '__root__'
     | '/'
     | '/auth/login'
     | '/auth/register'
     | '/demo/convex'
-    | '/demo/dashboard'
+    | '/dashboard/'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
@@ -102,7 +97,7 @@ export interface RootRouteChildren {
   AuthLoginRoute: typeof AuthLoginRoute
   AuthRegisterRoute: typeof AuthRegisterRoute
   DemoConvexRoute: typeof DemoConvexRoute
-  DemoDashboardRoute: typeof DemoDashboardRoute
+  DashboardIndexRoute: typeof DashboardIndexRoute
 }
 export interface FileServerRoutesByFullPath {
   '/api/auth/$': typeof ApiAuthSplatServerRoute
@@ -135,11 +130,11 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof IndexRouteImport
       parentRoute: typeof rootRouteImport
     }
-    '/demo/dashboard': {
-      id: '/demo/dashboard'
-      path: '/demo/dashboard'
-      fullPath: '/demo/dashboard'
-      preLoaderRoute: typeof DemoDashboardRouteImport
+    '/dashboard/': {
+      id: '/dashboard/'
+      path: '/dashboard'
+      fullPath: '/dashboard'
+      preLoaderRoute: typeof DashboardIndexRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/demo/convex': {
@@ -182,7 +177,7 @@ const rootRouteChildren: RootRouteChildren = {
   AuthLoginRoute: AuthLoginRoute,
   AuthRegisterRoute: AuthRegisterRoute,
   DemoConvexRoute: DemoConvexRoute,
-  DemoDashboardRoute: DemoDashboardRoute,
+  DashboardIndexRoute: DashboardIndexRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)

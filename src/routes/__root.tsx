@@ -25,6 +25,8 @@ import appCss from "@/styles.css?url";
 import { authClient } from "@/integrations/better-auth/client";
 import { NotFound } from "@/components/NotFound";
 import { DefaultCatchBoundary } from "@/components/DefaultCatchBoundary";
+import { getThemeServerFn } from "@/lib/theme";
+import { ThemeProvider } from "@/components/theme/ThemeProvider";
 
 // Get auth information for SSR using available cookies
 const fetchAuth = createServerFn({ method: "GET" }).handler(async () => {
@@ -66,6 +68,8 @@ export const Route = createRootRouteWithContext<MyRouterContext>()({
     ],
   }),
 
+  loader: () => getThemeServerFn(),
+
   beforeLoad: async (ctx) => {
     // all queries, mutations and action made with TanStack Query will be
     // authenticated by an identity token.
@@ -86,6 +90,7 @@ export const Route = createRootRouteWithContext<MyRouterContext>()({
 
 function RootComponent() {
   const context = useRouteContext({ from: Route.id });
+
   return (
     <ConvexBetterAuthProvider
       client={context.convexClient}
@@ -99,29 +104,37 @@ function RootComponent() {
 }
 
 function RootDocument({ children }: { children: React.ReactNode }) {
+  const theme = Route.useLoaderData();
   return (
-    <html lang="en" suppressHydrationWarning suppressContentEditableWarning>
-      <head>
-        <HeadContent />
-      </head>
-      <body>
-        <Header />
-        <Toaster />
-        {children}
-        <TanstackDevtools
-          config={{
-            position: "bottom-left",
-          }}
-          plugins={[
-            {
-              name: "Tanstack Router",
-              render: <TanStackRouterDevtoolsPanel />,
-            },
-            TanStackQueryDevtools,
-          ]}
-        />
-        <Scripts />
-      </body>
-    </html>
+    <ThemeProvider theme={theme}>
+      <html
+        lang="en"
+        className={theme}
+        suppressHydrationWarning
+        suppressContentEditableWarning
+      >
+        <head>
+          <HeadContent />
+        </head>
+        <body>
+          <Header />
+          <Toaster />
+          {children}
+          <TanstackDevtools
+            config={{
+              position: "bottom-left",
+            }}
+            plugins={[
+              {
+                name: "Tanstack Router",
+                render: <TanStackRouterDevtoolsPanel />,
+              },
+              TanStackQueryDevtools,
+            ]}
+          />
+          <Scripts />
+        </body>
+      </html>
+    </ThemeProvider>
   );
 }

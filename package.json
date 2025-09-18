@@ -16,6 +16,7 @@
   "dependencies": {
     "@convex-dev/better-auth": "^0.8.4",
     "@convex-dev/react-query": "0.0.0-alpha.8",
+    "@convex-dev/resend": "^0.1.13",
     "@hookform/resolvers": "^5.2.2",
     "@radix-ui/react-accordion": "^1.2.12",
     "@radix-ui/react-alert-dialog": "^1.1.15",
@@ -43,6 +44,7 @@
     "@radix-ui/react-toggle": "^1.1.10",
     "@radix-ui/react-toggle-group": "^1.1.11",
     "@radix-ui/react-tooltip": "^1.2.8",
+    "@react-email/components": "^0.5.3",
     "@t3-oss/env-core": "^0.12.0",
     "@tailwindcss/vite": "^4.0.6",
     "@tanstack/react-devtools": "^0.2.2",
@@ -59,6 +61,7 @@
     "clsx": "^2.1.1",
     "cmdk": "^1.1.1",
     "convex": "^1.27.0",
+    "convex-helpers": "^0.1.104",
     "date-fns": "^4.1.0",
     "embla-carousel-react": "^8.6.0",
     "input-otp": "^1.4.2",
@@ -93,4 +96,3 @@
     "web-vitals": "^4.2.4"
   }
 }
-

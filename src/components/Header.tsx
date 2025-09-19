@@ -3,37 +3,33 @@ import { Link } from "@tanstack/react-router";
 import { ThemeToggle } from "./theme/ThemeToggle";
 
 export default function Header() {
-  const { data: session } = useSession();
+	const { data: session } = useSession();
 
-  const isLoggedIn = !!session?.user;
+	const isLoggedIn = !!session?.user;
 
-  return (
-    <header className="p-2 flex gap-2 justify-between">
-      <nav className="flex flex-row">
-        <div className="px-2 font-bold">
-          <Link to="/">Home</Link>
-        </div>
+	return (
+		<header className="p-2 flex gap-2 justify-between">
+			<nav className="flex flex-row">
+				<div className="px-2 font-bold">
+					<Link to="/">Home</Link>
+				</div>
 
-        <div className="px-2 font-bold">
-          <Link to="/demo/convex">Convex</Link>
-        </div>
+				{isLoggedIn && (
+					<div className="px-2 font-bold">
+						<Link to="/dashboard">Dashboard</Link>
+					</div>
+				)}
 
-        {isLoggedIn && (
-          <div className="px-2 font-bold">
-            <Link to="/dashboard">Dashboard</Link>
-          </div>
-        )}
+				<div className="px-2 font-bold">
+					<Link to="/auth/register">Register</Link>
+				</div>
 
-        <div className="px-2 font-bold">
-          <Link to="/auth/register">Register</Link>
-        </div>
+				<div className="px-2 font-bold">
+					<Link to="/auth/login">Login</Link>
+				</div>
 
-        <div className="px-2 font-bold">
-          <Link to="/auth/login">Login</Link>
-        </div>
-
-        <ThemeToggle />
-      </nav>
-    </header>
-  );
+				<ThemeToggle />
+			</nav>
+		</header>
+	);
 }

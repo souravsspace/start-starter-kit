@@ -17,16 +17,13 @@ import { components, internal } from "./_generated/api";
 import betterAuthSchema from "./betterAuth/schema";
 import { DataModel, Id } from "./_generated/dataModel";
 import { query, QueryCtx } from "./_generated/server";
-import { asyncMap, withoutSystemFields } from "convex-helpers";
+import {  withoutSystemFields } from "convex-helpers";
 
-// This implementation is upgraded to 0.8 Local Install with no
-// database migration required. It continues the pattern of writing
-// userId to the Better Auth users table and maintaining a separate
-// users table for application data.
-
-const siteUrl = process.env.SITE_URL || process.env.VITE_SITE_URL;
 
 const authFunctions: AuthFunctions = internal.auth;
+const siteUrl = process.env.SITE_URL || process.env.VITE_SITE_URL;
+
+
 
 export const authComponent = createClient<DataModel, typeof betterAuthSchema>(
   components.betterAuth,
@@ -39,8 +36,8 @@ export const authComponent = createClient<DataModel, typeof betterAuthSchema>(
     triggers: {
       user: {
         onCreate: async (ctx, authUser) => {
-          const userId = await ctx.db.insert("users", {
-            email: authUser.email,
+          const userId = await ctx.db.insert("user", {
+            ...authUser,
           });
           await authComponent.setUserId(ctx, authUser._id, userId);
         },
@@ -48,22 +45,18 @@ export const authComponent = createClient<DataModel, typeof betterAuthSchema>(
           if (oldUser.email === newUser.email) {
             return;
           }
-          await ctx.db.patch(newUser.userId as Id<"users">, {
-            email: newUser.email,
+          // Extract only the fields we want to update, excluding _id and other system fields
+          const { _id, _creationTime, ...updateFields } = newUser;
+          await ctx.db.patch(newUser.userId as Id<"user">, {
+            ...updateFields,
+            email: oldUser.email
           });
         },
         onDelete: async (ctx, authUser) => {
-          const user = await ctx.db.get(authUser.userId as Id<"users">);
+          const user = await ctx.db.get(authUser.userId as Id<"user">);
           if (!user) {
             return;
           }
-          const todos = await ctx.db
-            .query("todos")
-            .withIndex("userId", (q) => q.eq("userId", user._id))
-            .collect();
-          await asyncMap(todos, async (todo) => {
-            await ctx.db.delete(todo._id);
-          });
           await ctx.db.delete(user._id);
         },
       },
@@ -157,7 +150,7 @@ export const safeGetUser = async (ctx: QueryCtx) => {
   if (!authUser) {
     return;
   }
-  const user = await ctx.db.get(authUser.userId as Id<"users">);
+  const user = await ctx.db.get(authUser.userId as Id<"user">);
   if (!user) {
     return;
   }

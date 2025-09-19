@@ -1,22 +1,7 @@
 import { defineSchema, defineTable } from "convex/server";
 import { v } from "convex/values";
+import { tables as betterAuthTables } from "./betterAuth/schema";
 
 export default defineSchema({
-  users: defineTable({
-    email: v.string(),
-  }).index("email", ["email"]),
-
-  todos: defineTable({
-    text: v.string(),
-    completed: v.boolean(),
-    userId: v.id("users"),
-    createdAt: v.number(),
-    updatedAt: v.number(),
-  }).index("userId", ["userId"]),
-  
-  products: defineTable({
-    title: v.string(),
-    imageId: v.string(),
-    price: v.number(),
-  }),
+  ...betterAuthTables,
 });

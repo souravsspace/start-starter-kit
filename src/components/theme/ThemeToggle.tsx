@@ -2,6 +2,7 @@ import { Button } from "@/components/ui/button";
 import { useTheme } from "@/components/theme/ThemeProvider";
 import { Moon, Sun } from "lucide-react";
 
+// FIXME: fix the toggle is late
 export function ThemeToggle() {
   const { theme, setTheme } = useTheme();
   return (

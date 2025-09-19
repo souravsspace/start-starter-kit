@@ -19,7 +19,6 @@ import { getCookie, getWebRequest } from "@tanstack/react-start/server";
 import type { ConvexReactClient } from "convex/react";
 
 import { DefaultCatchBoundary } from "@/components/DefaultCatchBoundary";
-import Header from "@/components/Header";
 import { NotFound } from "@/components/NotFound";
 import { ThemeProvider } from "@/components/theme/ThemeProvider";
 import { Toaster } from "@/components/ui/sonner";
@@ -119,10 +118,7 @@ function RootDocument({ children }: { children: React.ReactNode }) {
 				<body>
 					<Toaster />
 
-					<main className="min-h-dvh flex flex-col">
-						<Header />
-						<div className="flex-1">{children}</div>
-					</main>
+					{children}
 					<TanstackDevtools
 						config={{
 							position: "bottom-left",

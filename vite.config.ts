@@ -3,6 +3,9 @@ import { tanstackStart } from "@tanstack/react-start/plugin/vite";
 import viteReact from "@vitejs/plugin-react";
 import viteTsConfigPaths from "vite-tsconfig-paths";
 import tailwindcss from "@tailwindcss/vite";
+import dotenv from "dotenv";
+
+dotenv.config({ path: "./.env.local" });
 
 const config = defineConfig({
   plugins: [

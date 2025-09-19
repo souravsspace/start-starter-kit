@@ -15,6 +15,7 @@ import { Route as AuthRouteImport } from './routes/auth'
 import { Route as MarketingRouteImport } from './routes/_marketing'
 import { Route as DashboardIndexRouteImport } from './routes/dashboard/index'
 import { Route as MarketingIndexRouteImport } from './routes/_marketing/index'
+import { Route as DashboardSettingsRouteImport } from './routes/dashboard/settings'
 import { Route as AuthRegisterRouteImport } from './routes/auth/register'
 import { Route as AuthLoginRouteImport } from './routes/auth/login'
 import { Route as MarketingTermsRouteImport } from './routes/_marketing/terms'
@@ -45,6 +46,11 @@ const MarketingIndexRoute = MarketingIndexRouteImport.update({
   id: '/',
   path: '/',
   getParentRoute: () => MarketingRoute,
+} as any)
+const DashboardSettingsRoute = DashboardSettingsRouteImport.update({
+  id: '/dashboard/settings',
+  path: '/dashboard/settings',
+  getParentRoute: () => rootRouteImport,
 } as any)
 const AuthRegisterRoute = AuthRegisterRouteImport.update({
   id: '/register',
@@ -102,6 +108,7 @@ export interface FileRoutesByFullPath {
   '/terms': typeof MarketingTermsRoute
   '/auth/login': typeof AuthLoginRoute
   '/auth/register': typeof AuthRegisterRoute
+  '/dashboard/settings': typeof DashboardSettingsRoute
   '/': typeof MarketingIndexRoute
   '/dashboard': typeof DashboardIndexRoute
 }
@@ -115,6 +122,7 @@ export interface FileRoutesByTo {
   '/terms': typeof MarketingTermsRoute
   '/auth/login': typeof AuthLoginRoute
   '/auth/register': typeof AuthRegisterRoute
+  '/dashboard/settings': typeof DashboardSettingsRoute
   '/': typeof MarketingIndexRoute
   '/dashboard': typeof DashboardIndexRoute
 }
@@ -130,6 +138,7 @@ export interface FileRoutesById {
   '/_marketing/terms': typeof MarketingTermsRoute
   '/auth/login': typeof AuthLoginRoute
   '/auth/register': typeof AuthRegisterRoute
+  '/dashboard/settings': typeof DashboardSettingsRoute
   '/_marketing/': typeof MarketingIndexRoute
   '/dashboard/': typeof DashboardIndexRoute
 }
@@ -145,6 +154,7 @@ export interface FileRouteTypes {
     | '/terms'
     | '/auth/login'
     | '/auth/register'
+    | '/dashboard/settings'
     | '/'
     | '/dashboard'
   fileRoutesByTo: FileRoutesByTo
@@ -158,6 +168,7 @@ export interface FileRouteTypes {
     | '/terms'
     | '/auth/login'
     | '/auth/register'
+    | '/dashboard/settings'
     | '/'
     | '/dashboard'
   id:
@@ -172,6 +183,7 @@ export interface FileRouteTypes {
     | '/_marketing/terms'
     | '/auth/login'
     | '/auth/register'
+    | '/dashboard/settings'
     | '/_marketing/'
     | '/dashboard/'
   fileRoutesById: FileRoutesById
@@ -179,6 +191,7 @@ export interface FileRouteTypes {
 export interface RootRouteChildren {
   MarketingRoute: typeof MarketingRouteWithChildren
   AuthRoute: typeof AuthRouteWithChildren
+  DashboardSettingsRoute: typeof DashboardSettingsRoute
   DashboardIndexRoute: typeof DashboardIndexRoute
 }
 export interface FileServerRoutesByFullPath {
@@ -232,6 +245,13 @@ declare module '@tanstack/react-router' {
       fullPath: '/'
       preLoaderRoute: typeof MarketingIndexRouteImport
       parentRoute: typeof MarketingRoute
+    }
+    '/dashboard/settings': {
+      id: '/dashboard/settings'
+      path: '/dashboard/settings'
+      fullPath: '/dashboard/settings'
+      preLoaderRoute: typeof DashboardSettingsRouteImport
+      parentRoute: typeof rootRouteImport
     }
     '/auth/register': {
       id: '/auth/register'
@@ -342,6 +362,7 @@ const AuthRouteWithChildren = AuthRoute._addFileChildren(AuthRouteChildren)
 const rootRouteChildren: RootRouteChildren = {
   MarketingRoute: MarketingRouteWithChildren,
   AuthRoute: AuthRouteWithChildren,
+  DashboardSettingsRoute: DashboardSettingsRoute,
   DashboardIndexRoute: DashboardIndexRoute,
 }
 export const routeTree = rootRouteImport

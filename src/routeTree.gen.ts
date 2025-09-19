@@ -20,6 +20,7 @@ import { Route as AuthLoginRouteImport } from './routes/auth/login'
 import { Route as MarketingTermsRouteImport } from './routes/_marketing/terms'
 import { Route as MarketingPrivacyRouteImport } from './routes/_marketing/privacy'
 import { Route as MarketingPricingRouteImport } from './routes/_marketing/pricing'
+import { Route as MarketingHelpRouteImport } from './routes/_marketing/help'
 import { Route as MarketingContactRouteImport } from './routes/_marketing/contact'
 import { Route as MarketingAboutRouteImport } from './routes/_marketing/about'
 import { ServerRoute as ApiAuthSplatServerRouteImport } from './routes/api/auth/$'
@@ -70,6 +71,11 @@ const MarketingPricingRoute = MarketingPricingRouteImport.update({
   path: '/pricing',
   getParentRoute: () => MarketingRoute,
 } as any)
+const MarketingHelpRoute = MarketingHelpRouteImport.update({
+  id: '/help',
+  path: '/help',
+  getParentRoute: () => MarketingRoute,
+} as any)
 const MarketingContactRoute = MarketingContactRouteImport.update({
   id: '/contact',
   path: '/contact',
@@ -90,6 +96,7 @@ export interface FileRoutesByFullPath {
   '/auth': typeof AuthRouteWithChildren
   '/about': typeof MarketingAboutRoute
   '/contact': typeof MarketingContactRoute
+  '/help': typeof MarketingHelpRoute
   '/pricing': typeof MarketingPricingRoute
   '/privacy': typeof MarketingPrivacyRoute
   '/terms': typeof MarketingTermsRoute
@@ -102,6 +109,7 @@ export interface FileRoutesByTo {
   '/auth': typeof AuthRouteWithChildren
   '/about': typeof MarketingAboutRoute
   '/contact': typeof MarketingContactRoute
+  '/help': typeof MarketingHelpRoute
   '/pricing': typeof MarketingPricingRoute
   '/privacy': typeof MarketingPrivacyRoute
   '/terms': typeof MarketingTermsRoute
@@ -116,6 +124,7 @@ export interface FileRoutesById {
   '/auth': typeof AuthRouteWithChildren
   '/_marketing/about': typeof MarketingAboutRoute
   '/_marketing/contact': typeof MarketingContactRoute
+  '/_marketing/help': typeof MarketingHelpRoute
   '/_marketing/pricing': typeof MarketingPricingRoute
   '/_marketing/privacy': typeof MarketingPrivacyRoute
   '/_marketing/terms': typeof MarketingTermsRoute
@@ -130,6 +139,7 @@ export interface FileRouteTypes {
     | '/auth'
     | '/about'
     | '/contact'
+    | '/help'
     | '/pricing'
     | '/privacy'
     | '/terms'
@@ -142,6 +152,7 @@ export interface FileRouteTypes {
     | '/auth'
     | '/about'
     | '/contact'
+    | '/help'
     | '/pricing'
     | '/privacy'
     | '/terms'
@@ -155,6 +166,7 @@ export interface FileRouteTypes {
     | '/auth'
     | '/_marketing/about'
     | '/_marketing/contact'
+    | '/_marketing/help'
     | '/_marketing/pricing'
     | '/_marketing/privacy'
     | '/_marketing/terms'
@@ -256,6 +268,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof MarketingPricingRouteImport
       parentRoute: typeof MarketingRoute
     }
+    '/_marketing/help': {
+      id: '/_marketing/help'
+      path: '/help'
+      fullPath: '/help'
+      preLoaderRoute: typeof MarketingHelpRouteImport
+      parentRoute: typeof MarketingRoute
+    }
     '/_marketing/contact': {
       id: '/_marketing/contact'
       path: '/contact'
@@ -287,6 +306,7 @@ declare module '@tanstack/react-start/server' {
 interface MarketingRouteChildren {
   MarketingAboutRoute: typeof MarketingAboutRoute
   MarketingContactRoute: typeof MarketingContactRoute
+  MarketingHelpRoute: typeof MarketingHelpRoute
   MarketingPricingRoute: typeof MarketingPricingRoute
   MarketingPrivacyRoute: typeof MarketingPrivacyRoute
   MarketingTermsRoute: typeof MarketingTermsRoute
@@ -296,6 +316,7 @@ interface MarketingRouteChildren {
 const MarketingRouteChildren: MarketingRouteChildren = {
   MarketingAboutRoute: MarketingAboutRoute,
   MarketingContactRoute: MarketingContactRoute,
+  MarketingHelpRoute: MarketingHelpRoute,
   MarketingPricingRoute: MarketingPricingRoute,
   MarketingPrivacyRoute: MarketingPrivacyRoute,
   MarketingTermsRoute: MarketingTermsRoute,

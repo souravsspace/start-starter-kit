@@ -32,5 +32,4 @@ polar.registerRoutes(http, {
   },
 });
 
-
 export default http;

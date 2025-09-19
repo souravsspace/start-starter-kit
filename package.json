@@ -1,6 +1,7 @@
 {
   "name": "start-starter-kit",
   "version": "0.0.1",
+  "domain": "start.starter.kit",
   "private": true,
   "type": "module",
   "scripts": {

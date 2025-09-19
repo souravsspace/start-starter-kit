@@ -1,7 +1,7 @@
 import { Link } from "@tanstack/react-router";
 import { Icons } from "../Icons";
 import { ThemeToggle } from "../theme/ThemeToggle";
-import { marketingFooterLinks as links } from "@/app-config";
+import { appConfig, marketingFooterLinks as links } from "@/app-config";
 
 export const Footer = () => {
   return (
@@ -14,7 +14,7 @@ export const Footer = () => {
             </Link>
           </div>
 
-          <div className="grid grid-cols-2 gap-6 sm:grid-cols-4 md:col-span-3">
+          <div className="grid grid-cols-2 gap-6 sm:grid-cols-3 md:col-span-3">
             {links.map((link, index) => (
               <div key={index} className="space-y-4 text-sm">
                 <span className="block font-medium">{link.group}</span>
@@ -33,7 +33,7 @@ export const Footer = () => {
         </div>
         <div className="mt-12 flex flex-wrap items-end justify-between gap-6 border-t py-6">
           <span className="text-muted-foreground order-last block text-center text-sm md:order-first">
-            © {new Date().getFullYear()} Tailark, All rights reserved
+            © {new Date().getFullYear()} {appConfig.name}, All rights reserved
           </span>
           <div className="order-first flex flex-wrap justify-center gap-6 text-sm md:order-last">
             <ThemeToggle />

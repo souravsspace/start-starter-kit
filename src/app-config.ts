@@ -6,11 +6,14 @@ export const appConfig = {
     .map((word) => word.charAt(0).toUpperCase() + word.slice(1))
     .join(" "),
   version: packageJson.version,
+  supportEmail: {
+    general: `hello@${packageJson.domain}`,
+    support: `support@${packageJson.domain}`,
+  },
 };
 
 export const marketingHeaderMenuItems = [
-  { name: "Features", href: "#features" },
-  { name: "Solution", href: "#solution" },
+  { name: "Faqs", href: "#faqs" },
   { name: "Pricing", href: "/pricing" },
   { name: "About", href: "/about" },
 ];
@@ -19,90 +22,26 @@ export const marketingFooterLinks = [
   {
     group: "Product",
     items: [
-      { title: "Features", href: "#features" },
-      { title: "Solution", href: "#solution" },
+      { title: "FAQs", href: "#faqs" },
       { title: "Pricing", href: "/pricing" },
-      { title: "Help", href: "#" },
+      { title: "Help", href: "/contact" },
       { title: "About", href: "/about" },
-    ],
-  },
-  {
-    group: "Solution",
-    items: [
-      {
-        title: "Startup",
-        href: "#",
-      },
-      {
-        title: "Freelancers",
-        href: "#",
-      },
-      {
-        title: "Organizations",
-        href: "#",
-      },
-      {
-        title: "Collaboration",
-        href: "#",
-      },
-      {
-        title: "Design",
-        href: "#",
-      },
-      {
-        title: "Management",
-        href: "#",
-      },
     ],
   },
   {
     group: "Company",
     items: [
-      {
-        title: "About",
-        href: "#",
-      },
-      {
-        title: "Careers",
-        href: "#",
-      },
-      {
-        title: "Blog",
-        href: "#",
-      },
-      {
-        title: "Press",
-        href: "#",
-      },
-      {
-        title: "Contact",
-        href: "#",
-      },
-      {
-        title: "Help",
-        href: "#",
-      },
+      { title: "About", href: "/about" },
+      { title: "Docs", href: "/docs" },
+      { title: "Contact", href: "/contact" },
+      { title: "Help", href: "/contact" },
     ],
   },
   {
     group: "Legal",
     items: [
-      {
-        title: "Licence",
-        href: "#",
-      },
-      {
-        title: "Privacy",
-        href: "#",
-      },
-      {
-        title: "Cookies",
-        href: "#",
-      },
-      {
-        title: "Security",
-        href: "#",
-      },
+      { title: "Privacy", href: "/privacy" },
+      { title: "Terms", href: "/terms" },
     ],
   },
 ];

@@ -7,11 +7,12 @@ import {
   CardTitle,
 } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-import { signOut, useSession } from "@/integrations/better-auth/client";
-import { Link, createFileRoute } from "@tanstack/react-router";
+import { signOut, useSession, sendVerificationEmail } from "@/integrations/better-auth/client";
+import { Link, createFileRoute, useNavigate } from "@tanstack/react-router";
 import { SubscriptionBadge } from "@/components/subscription/SubscriptionBadge";
 import { Confetti } from "@/components/magic-ui/confetti";
-import { useEffect, useRef } from "react";
+import { useEffect, useRef, useState } from "react";
+import { toast } from "sonner";
 
 export const Route = createFileRoute("/dashboard/")({
   component: RouteComponent,
@@ -26,8 +27,26 @@ export const Route = createFileRoute("/dashboard/")({
 
 function RouteComponent() {
   const { data: session } = useSession();
+  const navigate = useNavigate();
   const search = Route.useSearch();
   const confettiRef = useRef<any>(null);
+  const [isSendingEmail, setIsSendingEmail] = useState(false);
+
+  const handleSendVerificationEmail = async () => {
+    if (!session?.user?.email) return;
+    
+    setIsSendingEmail(true);
+    try {
+      await sendVerificationEmail();
+      toast.success("Verification email sent! Please check your inbox.");
+      // Navigate to verification page using TanStack router
+      navigate({ to: "/auth/verify-email" });
+    } catch (error) {
+      console.error("Failed to send verification email to", session.user.email, ":", error);
+      toast.error("Failed to send verification email. Please try again.");
+      setIsSendingEmail(false);
+    }
+  };
 
   useEffect(() => {
     // Check if we should celebrate - either success=true or customer_session_token present
@@ -47,14 +66,12 @@ function RouteComponent() {
       // This ensures the subscription state is updated after payment
       setTimeout(() => {
         // Clean up the URL by removing success, customer_session_token, and plan parameters
-        const url = new URL(window.location.href);
-        url.searchParams.delete("success");
-        url.searchParams.delete("customer_session_token");
-        url.searchParams.delete("plan");
-        window.history.replaceState({}, "", url.toString());
+        navigate({ to: "/dashboard", search: {}, replace: true });
         
-        // Force page reload to refresh subscription data
-        window.location.reload();
+        // Force refresh subscription data by reloading the page
+        setTimeout(() => {
+          navigate({ to: "/dashboard", replace: true });
+        }, 2000);
       }, 2000);
     }
   }, [search.success, search.customer_session_token]);
@@ -100,15 +117,27 @@ function RouteComponent() {
                 <span>Plan:</span>
                 <SubscriptionBadge />
               </div>
-              <div className="flex justify-between">
+              <div className="flex justify-between items-center gap-2">
                 <span>Email Verified:</span>
-                <Badge
-                  variant={
-                    session?.user?.emailVerified ? "default" : "secondary"
-                  }
-                >
-                  {session?.user?.emailVerified ? "Verified" : "Pending"}
-                </Badge>
+                <div className="flex items-center gap-2">
+                  <Badge
+                    variant={
+                      session?.user?.emailVerified ? "default" : "secondary"
+                    }
+                  >
+                    {session?.user?.emailVerified ? "Verified" : "Pending"}
+                  </Badge>
+                  {!session?.user?.emailVerified && (
+                    <Button
+                      size="sm"
+                      variant="outline"
+                      onClick={handleSendVerificationEmail}
+                      disabled={isSendingEmail}
+                    >
+                      {isSendingEmail ? "Sending..." : "Verify Email"}
+                    </Button>
+                  )}
+                </div>
               </div>
             </div>
           </CardContent>

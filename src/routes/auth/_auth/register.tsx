@@ -18,7 +18,7 @@ import { useForm } from "react-hook-form";
 import { toast } from "sonner";
 import { z } from "zod";
 
-export const Route = createFileRoute("/auth/register")({
+export const Route = createFileRoute("/auth/_auth/register")({
 	component: RouteComponent,
 });
 
@@ -43,7 +43,7 @@ function RouteComponent() {
 			email: "",
 			password: "",
 		},
-	});
+	})
 
 	const isLoading =
 		form.formState.isSubmitting || form.formState.isLoading || isSubmitting;
@@ -70,10 +70,10 @@ function RouteComponent() {
 						console.error("ERROR: ", ctx.error);
 						toast.error(
 							ctx.error.message || "Something went wrong. Please try again.",
-						);
+						)
 					},
 				},
-			);
+			)
 
 			if (result.error) {
 				console.error("Signup error:", result.error);
@@ -84,7 +84,7 @@ function RouteComponent() {
 			console.error("Signup catch error:", err);
 			toast.error("Network error. Please try again.");
 		}
-	};
+	}
 
 	const onGoogleSignIn = async () => {
 		const { error } = await signIn.social(
@@ -103,9 +103,9 @@ function RouteComponent() {
 					toast.error("Something went wrong. Please try again.");
 				},
 			},
-		);
+		)
 		console.error({ error });
-	};
+	}
 
 	const onGithubSignIn = async () => {
 		const { error } = await signIn.social(
@@ -124,9 +124,9 @@ function RouteComponent() {
 					toast.error("Something went wrong. Please try again.");
 				},
 			},
-		);
+		)
 		console.error({ error });
-	};
+	}
 
 	return (
 		<section className="flex bg-zinc-50 px-4 py-16  dark:bg-transparent">
@@ -284,5 +284,5 @@ function RouteComponent() {
 				</form>
 			</Form>
 		</section>
-	);
+	)
 }

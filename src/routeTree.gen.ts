@@ -11,23 +11,31 @@
 import { createServerRootRoute } from '@tanstack/react-start/server'
 
 import { Route as rootRouteImport } from './routes/__root'
+import { Route as DashboardRouteImport } from './routes/dashboard'
 import { Route as AuthRouteImport } from './routes/auth'
 import { Route as MarketingRouteImport } from './routes/_marketing'
 import { Route as DashboardIndexRouteImport } from './routes/dashboard/index'
 import { Route as MarketingIndexRouteImport } from './routes/_marketing/index'
 import { Route as DashboardSettingsRouteImport } from './routes/dashboard/settings'
-import { Route as AuthRegisterRouteImport } from './routes/auth/register'
-import { Route as AuthLoginRouteImport } from './routes/auth/login'
+import { Route as AuthVerifyEmailRouteImport } from './routes/auth/verify-email'
+import { Route as AuthAuthRouteImport } from './routes/auth/_auth'
 import { Route as MarketingTermsRouteImport } from './routes/_marketing/terms'
 import { Route as MarketingPrivacyRouteImport } from './routes/_marketing/privacy'
 import { Route as MarketingPricingRouteImport } from './routes/_marketing/pricing'
 import { Route as MarketingHelpRouteImport } from './routes/_marketing/help'
 import { Route as MarketingContactRouteImport } from './routes/_marketing/contact'
 import { Route as MarketingAboutRouteImport } from './routes/_marketing/about'
+import { Route as AuthAuthRegisterRouteImport } from './routes/auth/_auth/register'
+import { Route as AuthAuthLoginRouteImport } from './routes/auth/_auth/login'
 import { ServerRoute as ApiAuthSplatServerRouteImport } from './routes/api/auth/$'
 
 const rootServerRouteImport = createServerRootRoute()
 
+const DashboardRoute = DashboardRouteImport.update({
+  id: '/dashboard',
+  path: '/dashboard',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const AuthRoute = AuthRouteImport.update({
   id: '/auth',
   path: '/auth',
@@ -38,9 +46,9 @@ const MarketingRoute = MarketingRouteImport.update({
   getParentRoute: () => rootRouteImport,
 } as any)
 const DashboardIndexRoute = DashboardIndexRouteImport.update({
-  id: '/dashboard/',
-  path: '/dashboard/',
-  getParentRoute: () => rootRouteImport,
+  id: '/',
+  path: '/',
+  getParentRoute: () => DashboardRoute,
 } as any)
 const MarketingIndexRoute = MarketingIndexRouteImport.update({
   id: '/',
@@ -48,18 +56,17 @@ const MarketingIndexRoute = MarketingIndexRouteImport.update({
   getParentRoute: () => MarketingRoute,
 } as any)
 const DashboardSettingsRoute = DashboardSettingsRouteImport.update({
-  id: '/dashboard/settings',
-  path: '/dashboard/settings',
-  getParentRoute: () => rootRouteImport,
+  id: '/settings',
+  path: '/settings',
+  getParentRoute: () => DashboardRoute,
 } as any)
-const AuthRegisterRoute = AuthRegisterRouteImport.update({
-  id: '/register',
-  path: '/register',
+const AuthVerifyEmailRoute = AuthVerifyEmailRouteImport.update({
+  id: '/verify-email',
+  path: '/verify-email',
   getParentRoute: () => AuthRoute,
 } as any)
-const AuthLoginRoute = AuthLoginRouteImport.update({
-  id: '/login',
-  path: '/login',
+const AuthAuthRoute = AuthAuthRouteImport.update({
+  id: '/_auth',
   getParentRoute: () => AuthRoute,
 } as any)
 const MarketingTermsRoute = MarketingTermsRouteImport.update({
@@ -92,6 +99,16 @@ const MarketingAboutRoute = MarketingAboutRouteImport.update({
   path: '/about',
   getParentRoute: () => MarketingRoute,
 } as any)
+const AuthAuthRegisterRoute = AuthAuthRegisterRouteImport.update({
+  id: '/register',
+  path: '/register',
+  getParentRoute: () => AuthAuthRoute,
+} as any)
+const AuthAuthLoginRoute = AuthAuthLoginRouteImport.update({
+  id: '/login',
+  path: '/login',
+  getParentRoute: () => AuthAuthRoute,
+} as any)
 const ApiAuthSplatServerRoute = ApiAuthSplatServerRouteImport.update({
   id: '/api/auth/$',
   path: '/api/auth/$',
@@ -99,64 +116,72 @@ const ApiAuthSplatServerRoute = ApiAuthSplatServerRouteImport.update({
 } as any)
 
 export interface FileRoutesByFullPath {
-  '/auth': typeof AuthRouteWithChildren
+  '/auth': typeof AuthAuthRouteWithChildren
+  '/dashboard': typeof DashboardRouteWithChildren
   '/about': typeof MarketingAboutRoute
   '/contact': typeof MarketingContactRoute
   '/help': typeof MarketingHelpRoute
   '/pricing': typeof MarketingPricingRoute
   '/privacy': typeof MarketingPrivacyRoute
   '/terms': typeof MarketingTermsRoute
-  '/auth/login': typeof AuthLoginRoute
-  '/auth/register': typeof AuthRegisterRoute
+  '/auth/verify-email': typeof AuthVerifyEmailRoute
   '/dashboard/settings': typeof DashboardSettingsRoute
   '/': typeof MarketingIndexRoute
-  '/dashboard': typeof DashboardIndexRoute
+  '/dashboard/': typeof DashboardIndexRoute
+  '/auth/login': typeof AuthAuthLoginRoute
+  '/auth/register': typeof AuthAuthRegisterRoute
 }
 export interface FileRoutesByTo {
-  '/auth': typeof AuthRouteWithChildren
+  '/auth': typeof AuthAuthRouteWithChildren
   '/about': typeof MarketingAboutRoute
   '/contact': typeof MarketingContactRoute
   '/help': typeof MarketingHelpRoute
   '/pricing': typeof MarketingPricingRoute
   '/privacy': typeof MarketingPrivacyRoute
   '/terms': typeof MarketingTermsRoute
-  '/auth/login': typeof AuthLoginRoute
-  '/auth/register': typeof AuthRegisterRoute
+  '/auth/verify-email': typeof AuthVerifyEmailRoute
   '/dashboard/settings': typeof DashboardSettingsRoute
   '/': typeof MarketingIndexRoute
   '/dashboard': typeof DashboardIndexRoute
+  '/auth/login': typeof AuthAuthLoginRoute
+  '/auth/register': typeof AuthAuthRegisterRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/_marketing': typeof MarketingRouteWithChildren
   '/auth': typeof AuthRouteWithChildren
+  '/dashboard': typeof DashboardRouteWithChildren
   '/_marketing/about': typeof MarketingAboutRoute
   '/_marketing/contact': typeof MarketingContactRoute
   '/_marketing/help': typeof MarketingHelpRoute
   '/_marketing/pricing': typeof MarketingPricingRoute
   '/_marketing/privacy': typeof MarketingPrivacyRoute
   '/_marketing/terms': typeof MarketingTermsRoute
-  '/auth/login': typeof AuthLoginRoute
-  '/auth/register': typeof AuthRegisterRoute
+  '/auth/_auth': typeof AuthAuthRouteWithChildren
+  '/auth/verify-email': typeof AuthVerifyEmailRoute
   '/dashboard/settings': typeof DashboardSettingsRoute
   '/_marketing/': typeof MarketingIndexRoute
   '/dashboard/': typeof DashboardIndexRoute
+  '/auth/_auth/login': typeof AuthAuthLoginRoute
+  '/auth/_auth/register': typeof AuthAuthRegisterRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
   fullPaths:
     | '/auth'
+    | '/dashboard'
     | '/about'
     | '/contact'
     | '/help'
     | '/pricing'
     | '/privacy'
     | '/terms'
-    | '/auth/login'
-    | '/auth/register'
+    | '/auth/verify-email'
     | '/dashboard/settings'
     | '/'
-    | '/dashboard'
+    | '/dashboard/'
+    | '/auth/login'
+    | '/auth/register'
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/auth'
@@ -166,33 +191,36 @@ export interface FileRouteTypes {
     | '/pricing'
     | '/privacy'
     | '/terms'
-    | '/auth/login'
-    | '/auth/register'
+    | '/auth/verify-email'
     | '/dashboard/settings'
     | '/'
     | '/dashboard'
+    | '/auth/login'
+    | '/auth/register'
   id:
     | '__root__'
     | '/_marketing'
     | '/auth'
+    | '/dashboard'
     | '/_marketing/about'
     | '/_marketing/contact'
     | '/_marketing/help'
     | '/_marketing/pricing'
     | '/_marketing/privacy'
     | '/_marketing/terms'
-    | '/auth/login'
-    | '/auth/register'
+    | '/auth/_auth'
+    | '/auth/verify-email'
     | '/dashboard/settings'
     | '/_marketing/'
     | '/dashboard/'
+    | '/auth/_auth/login'
+    | '/auth/_auth/register'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
   MarketingRoute: typeof MarketingRouteWithChildren
   AuthRoute: typeof AuthRouteWithChildren
-  DashboardSettingsRoute: typeof DashboardSettingsRoute
-  DashboardIndexRoute: typeof DashboardIndexRoute
+  DashboardRoute: typeof DashboardRouteWithChildren
 }
 export interface FileServerRoutesByFullPath {
   '/api/auth/$': typeof ApiAuthSplatServerRoute
@@ -218,6 +246,13 @@ export interface RootServerRouteChildren {
 
 declare module '@tanstack/react-router' {
   interface FileRoutesByPath {
+    '/dashboard': {
+      id: '/dashboard'
+      path: '/dashboard'
+      fullPath: '/dashboard'
+      preLoaderRoute: typeof DashboardRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/auth': {
       id: '/auth'
       path: '/auth'
@@ -234,10 +269,10 @@ declare module '@tanstack/react-router' {
     }
     '/dashboard/': {
       id: '/dashboard/'
-      path: '/dashboard'
-      fullPath: '/dashboard'
+      path: '/'
+      fullPath: '/dashboard/'
       preLoaderRoute: typeof DashboardIndexRouteImport
-      parentRoute: typeof rootRouteImport
+      parentRoute: typeof DashboardRoute
     }
     '/_marketing/': {
       id: '/_marketing/'
@@ -248,23 +283,23 @@ declare module '@tanstack/react-router' {
     }
     '/dashboard/settings': {
       id: '/dashboard/settings'
-      path: '/dashboard/settings'
+      path: '/settings'
       fullPath: '/dashboard/settings'
       preLoaderRoute: typeof DashboardSettingsRouteImport
-      parentRoute: typeof rootRouteImport
+      parentRoute: typeof DashboardRoute
     }
-    '/auth/register': {
-      id: '/auth/register'
-      path: '/register'
-      fullPath: '/auth/register'
-      preLoaderRoute: typeof AuthRegisterRouteImport
+    '/auth/verify-email': {
+      id: '/auth/verify-email'
+      path: '/verify-email'
+      fullPath: '/auth/verify-email'
+      preLoaderRoute: typeof AuthVerifyEmailRouteImport
       parentRoute: typeof AuthRoute
     }
-    '/auth/login': {
-      id: '/auth/login'
-      path: '/login'
-      fullPath: '/auth/login'
-      preLoaderRoute: typeof AuthLoginRouteImport
+    '/auth/_auth': {
+      id: '/auth/_auth'
+      path: ''
+      fullPath: '/auth'
+      preLoaderRoute: typeof AuthAuthRouteImport
       parentRoute: typeof AuthRoute
     }
     '/_marketing/terms': {
@@ -309,6 +344,20 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof MarketingAboutRouteImport
       parentRoute: typeof MarketingRoute
     }
+    '/auth/_auth/register': {
+      id: '/auth/_auth/register'
+      path: '/register'
+      fullPath: '/auth/register'
+      preLoaderRoute: typeof AuthAuthRegisterRouteImport
+      parentRoute: typeof AuthAuthRoute
+    }
+    '/auth/_auth/login': {
+      id: '/auth/_auth/login'
+      path: '/login'
+      fullPath: '/auth/login'
+      preLoaderRoute: typeof AuthAuthLoginRouteImport
+      parentRoute: typeof AuthAuthRoute
+    }
   }
 }
 declare module '@tanstack/react-start/server' {
@@ -347,23 +396,50 @@ const MarketingRouteWithChildren = MarketingRoute._addFileChildren(
   MarketingRouteChildren,
 )
 
+interface AuthAuthRouteChildren {
+  AuthAuthLoginRoute: typeof AuthAuthLoginRoute
+  AuthAuthRegisterRoute: typeof AuthAuthRegisterRoute
+}
+
+const AuthAuthRouteChildren: AuthAuthRouteChildren = {
+  AuthAuthLoginRoute: AuthAuthLoginRoute,
+  AuthAuthRegisterRoute: AuthAuthRegisterRoute,
+}
+
+const AuthAuthRouteWithChildren = AuthAuthRoute._addFileChildren(
+  AuthAuthRouteChildren,
+)
+
 interface AuthRouteChildren {
-  AuthLoginRoute: typeof AuthLoginRoute
-  AuthRegisterRoute: typeof AuthRegisterRoute
+  AuthAuthRoute: typeof AuthAuthRouteWithChildren
+  AuthVerifyEmailRoute: typeof AuthVerifyEmailRoute
 }
 
 const AuthRouteChildren: AuthRouteChildren = {
-  AuthLoginRoute: AuthLoginRoute,
-  AuthRegisterRoute: AuthRegisterRoute,
+  AuthAuthRoute: AuthAuthRouteWithChildren,
+  AuthVerifyEmailRoute: AuthVerifyEmailRoute,
 }
 
 const AuthRouteWithChildren = AuthRoute._addFileChildren(AuthRouteChildren)
 
+interface DashboardRouteChildren {
+  DashboardSettingsRoute: typeof DashboardSettingsRoute
+  DashboardIndexRoute: typeof DashboardIndexRoute
+}
+
+const DashboardRouteChildren: DashboardRouteChildren = {
+  DashboardSettingsRoute: DashboardSettingsRoute,
+  DashboardIndexRoute: DashboardIndexRoute,
+}
+
+const DashboardRouteWithChildren = DashboardRoute._addFileChildren(
+  DashboardRouteChildren,
+)
+
 const rootRouteChildren: RootRouteChildren = {
   MarketingRoute: MarketingRouteWithChildren,
   AuthRoute: AuthRouteWithChildren,
-  DashboardSettingsRoute: DashboardSettingsRoute,
-  DashboardIndexRoute: DashboardIndexRoute,
+  DashboardRoute: DashboardRouteWithChildren,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)

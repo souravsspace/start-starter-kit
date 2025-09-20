@@ -17,13 +17,10 @@ import { components, internal } from "./_generated/api";
 import betterAuthSchema from "./betterAuth/schema";
 import { DataModel } from "./_generated/dataModel";
 import { query, QueryCtx } from "./_generated/server";
-import {  withoutSystemFields } from "convex-helpers";
-
+import { withoutSystemFields } from "convex-helpers";
 
 const authFunctions: AuthFunctions = internal.auth;
 const siteUrl = process.env.SITE_URL || process.env.VITE_SITE_URL;
-
-
 
 export const authComponent = createClient<DataModel, typeof betterAuthSchema>(
   components.betterAuth,
@@ -36,10 +33,10 @@ export const authComponent = createClient<DataModel, typeof betterAuthSchema>(
     triggers: {
       user: {
         onCreate: async (ctx, authUser) => {
-          /** 
+          /**
            * The Better Auth user is already created in the auth schema
            * We just need to set the userId reference to the auth user's _id
-          **/
+           **/
           await authComponent.setUserId(ctx, authUser._id, authUser._id);
         },
       },

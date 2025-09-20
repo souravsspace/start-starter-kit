@@ -1,5 +1,5 @@
 import { Button } from "@/components/ui/button";
-import { Link, createFileRoute } from "@tanstack/react-router";
+import { Link, createFileRoute, useNavigate } from "@tanstack/react-router";
 import { api } from "convex/_generated/api";
 import { plans } from "convex/polar";
 import { useAction, useQuery } from "convex/react";
@@ -12,6 +12,7 @@ export const Route = createFileRoute("/_marketing/pricing")({
 });
 
 function RouteComponent() {
+  const navigate = useNavigate();
   const subscriptionStatus = useQuery(api.polar.getSubscriptionStatus);
   const subscriptionDetails = useQuery(api.polar.getSubscriptionDetails);
   const generateCheckoutLink = useAction(api.polar.generateCheckoutLink);
@@ -23,7 +24,7 @@ function RouteComponent() {
    */
   const handleCheckout = async (plan: "professional") => {
     if (!subscriptionStatus?.isAuthenticated) {
-      window.location.href = "/auth/login";
+      navigate({ to: "/auth/login" });
       return;
     }
 
@@ -34,11 +35,12 @@ function RouteComponent() {
 
       const result = await generateCheckoutLink({
         productIds,
-        origin: window.location.origin,
-        successUrl: `${window.location.origin}/dashboard?success=true`,
+        origin: typeof window !== 'undefined' ? window.location.origin : '',
+        successUrl: `${typeof window !== 'undefined' ? window.location.origin : ''}/dashboard?success=true`,
       });
 
       if (result.url) {
+        // For external checkout URLs, we still need to use window.location
         window.location.href = result.url;
       }
     } catch (error) {
@@ -114,7 +116,7 @@ function RouteComponent() {
                 disabled={getButtonState("starter").disabled || loadingPlan === "starter" || isLoading}
                 onClick={async () => {
                   if (!subscriptionStatus?.isAuthenticated) {
-                    window.location.href = "/auth/register";
+                    navigate({ to: "/auth/register" });
                   } else if (!subscriptionDetails?.cancelAtPeriodEnd && subscriptionStatus.canDowngradeTo.includes("starter")) {
                     // Handle downgrade to starter
                     setLoadingPlan("starter");

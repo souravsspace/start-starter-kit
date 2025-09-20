@@ -63,11 +63,12 @@ export function useSubscription() {
 
           const result = await generateCheckoutLink({
             productIds,
-            origin: window.location.origin,
-            successUrl: `${window.location.origin}/dashboard?success=true&plan=${targetPlan}`,
+            origin: typeof window !== 'undefined' ? window.location.origin : '',
+            successUrl: `${typeof window !== 'undefined' ? window.location.origin : ''}/dashboard?success=true&plan=${targetPlan}`,
           });
 
           if (result.url) {
+            // For external checkout URLs, we still need to use window.location
             window.location.href = result.url;
             return;
           }

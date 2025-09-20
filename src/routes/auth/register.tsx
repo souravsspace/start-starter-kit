@@ -63,7 +63,7 @@ function RouteComponent() {
 					onSuccess: async () => {
 						setIsSubmitting(false);
 						toast.success("Registered successfully!");
-						await navigate({ to: "/auth/login" });
+						await navigate({ to: "/dashboard" });
 					},
 					onError: (ctx) => {
 						setIsSubmitting(false);

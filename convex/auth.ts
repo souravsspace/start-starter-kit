@@ -15,7 +15,7 @@ import {
 import { requireMutationCtx } from "@convex-dev/better-auth/utils";
 import { components, internal } from "./_generated/api";
 import betterAuthSchema from "./betterAuth/schema";
-import { DataModel, Id } from "./_generated/dataModel";
+import { DataModel } from "./_generated/dataModel";
 import { query, QueryCtx } from "./_generated/server";
 import {  withoutSystemFields } from "convex-helpers";
 
@@ -36,28 +36,11 @@ export const authComponent = createClient<DataModel, typeof betterAuthSchema>(
     triggers: {
       user: {
         onCreate: async (ctx, authUser) => {
-          const userId = await ctx.db.insert("user", {
-            ...authUser,
-          });
-          await authComponent.setUserId(ctx, authUser._id, userId);
-        },
-        onUpdate: async (ctx, oldUser, newUser) => {
-          if (oldUser.email === newUser.email) {
-            return;
-          }
-          // Extract only the fields we want to update, excluding _id and other system fields
-          const { _id, _creationTime, ...updateFields } = newUser;
-          await ctx.db.patch(newUser.userId as Id<"user">, {
-            ...updateFields,
-            email: oldUser.email
-          });
-        },
-        onDelete: async (ctx, authUser) => {
-          const user = await ctx.db.get(authUser.userId as Id<"user">);
-          if (!user) {
-            return;
-          }
-          await ctx.db.delete(user._id);
+          /** 
+           * The Better Auth user is already created in the auth schema
+           * We just need to set the userId reference to the auth user's _id
+          **/
+          await authComponent.setUserId(ctx, authUser._id, authUser._id);
         },
       },
     },
@@ -150,11 +133,8 @@ export const safeGetUser = async (ctx: QueryCtx) => {
   if (!authUser) {
     return;
   }
-  const user = await ctx.db.get(authUser.userId as Id<"user">);
-  if (!user) {
-    return;
-  }
-  return { ...user, ...withoutSystemFields(authUser) };
+  // Return the auth user directly since it contains all user data
+  return withoutSystemFields(authUser);
 };
 
 export const getUser = async (ctx: QueryCtx) => {

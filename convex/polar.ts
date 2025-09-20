@@ -45,12 +45,12 @@ export const polar = new Polar(components.polar, {
     }
     
     // Debug logging
-    console.log("Polar getUserInfo - User ID:", user._id);
+    console.log("Polar getUserInfo - User ID:", user.userId);
     console.log("Polar getUserInfo - Email:", user.email);
     console.log("Polar getUserInfo - User object:", JSON.stringify(user, null, 2));
     
     return {
-      userId: user._id,
+      userId: user.userId as string,
       email: user.email,
     };
   },
@@ -115,7 +115,7 @@ export type SubscriptionPlan = "starter" | "professional" | "premiumLifetime";
 export const getSubscriptionStatus = query({
   handler: async (ctx) => {
     const user = await ctx.runQuery(api.auth.getCurrentUser);
-    if (!user) {
+    if (!user || !user.userId) {
       return {
         isAuthenticated: false,
         currentPlan: null,
@@ -125,7 +125,7 @@ export const getSubscriptionStatus = query({
     }
 
     const subscription = await polar.getCurrentSubscription(ctx, {
-      userId: user._id,
+      userId: user.userId,
     });
 
     const currentPlan = determineCurrentPlan(subscription?.productKey);
@@ -202,12 +202,12 @@ export const createCheckout = mutation({
     isSamePlan: boolean;
   }> => {
     const user = await ctx.runQuery(api.auth.getCurrentUser);
-    if (!user) {
+    if (!user || !user.userId) {
       throw new Error("User not authenticated");
     }
 
     const currentSubscription = await polar.getCurrentSubscription(ctx, {
-      userId: user._id,
+      userId: user.userId,
     });
     
     const currentPlan = determineCurrentPlan(currentSubscription?.productKey);
@@ -292,24 +292,15 @@ function validatePlanChange(currentPlan: SubscriptionPlan, targetPlan: "professi
  * Get current user with comprehensive subscription information
  * Combines user data with their active subscription details from Polar
  */
-const getCurrentUserWithSubscription = async (ctx: QueryCtx): Promise<Doc<"user"> & {
-  subscription: any;
-  isPremium: boolean;
-  isFree: boolean;
-  subscriptionStatus: string;
-  currentPeriodEnd: string | null | undefined;
-  currentPeriodStart: string | null | undefined;
-  cancelAtPeriodEnd: boolean;
-}> => {
-  // Fetch authenticated user from Better Auth
-  const user: Doc<"user"> | null = await ctx.runQuery(api.auth.getCurrentUser);
-  if (!user) {
+const getCurrentUserWithSubscription = async (ctx: QueryCtx): Promise<any> => {
+  const user = await ctx.runQuery(api.auth.getCurrentUser);
+  if (!user || !user.userId) {
     throw new Error("User not authenticated");
   }
 
   // Retrieve active subscription from Polar for this user
   const subscription = await polar.getCurrentSubscription(ctx, {
-    userId: user._id,
+    userId: user.userId,
   });
 
   // Determine premium status based on product key

@@ -15,7 +15,8 @@
     "test": "vitest run",
     "format": "biome format",
     "lint": "biome lint",
-    "check": "biome check"
+    "check": "biome check",
+    "postinstall": "patch-package"
   },
   "dependencies": {
     "@convex-dev/better-auth": "^0.8.4",
@@ -98,6 +99,7 @@
     "@vitejs/plugin-react": "^4.3.4",
     "concurrently": "^9.2.1",
     "jsdom": "^26.0.0",
+    "patch-package": "^8.0.0",
     "typescript": "^5.7.2",
     "vite": "^6.3.5",
     "vitest": "^3.0.5",

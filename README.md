@@ -44,8 +44,126 @@ pnpm check
 
 ## Setting up Convex
 
-- Set the `VITE_CONVEX_URL` and `CONVEX_DEPLOYMENT` environment variables in your `.env.local`. (Or run `npx convex init` to set them automatically.)
-- Run `npx convex dev` to start the Convex server.
+### Prerequisites
+- A Convex account ([dashboard.convex.dev](https://dashboard.convex.dev))
+- Node.js and pnpm installed
+
+### Initial Setup
+
+1. **Initialize Convex**:
+```bash
+npx convex init
+```
+
+2. **Set Environment Variables**:
+
+#### Local Environment Variables (in `.env.local`):
+```bash
+# Convex configuration, get this URL from your [Dashboard](dashboard.convex.dev)
+CONVEX_DEPLOYMENT=start-starter-kit
+
+# Better-auth
+BETTER_AUTH_SECRET=secret
+GOOGLE_CLIENT_ID=your-google-client-id
+GOOGLE_CLIENT_SECRET=your-google-client-secret
+GITHUB_CLIENT_ID=your-github-client-id
+GITHUB_CLIENT_SECRET=your-github-client-secret
+
+# Application URLs
+SITE_URL=http://localhost:3000
+VITE_SITE_URL=http://localhost:3000
+VITE_CONVEX_URL=https://your-deployment-name.convex.cloud
+VITE_CONVEX_SITE_URL=https://your-deployment-name.convex.site
+```
+
+#### Server-side Environment Variables (using Convex CLI):
+```bash
+# Authentication
+npx convex env set BETTER_AUTH_SECRET your_auth_secret_here
+npx convex env set GITHUB_CLIENT_ID your_github_client_id
+npx convex env set GITHUB_CLIENT_SECRET your_github_client_secret
+npx convex env set GOOGLE_CLIENT_ID your_google_client_id
+npx convex env set GOOGLE_CLIENT_SECRET your_google_client_secret
+
+# Email (Resend)
+npx convex env set RESEND_API_KEY your_resend_api_key
+
+# Payment Processing (Polar)
+npx convex env set POLAR_ORGANIZATION_TOKEN your_polar_org_token
+npx convex env set POLAR_WEBHOOK_SECRET your_polar_webhook_secret
+npx convex env set POLAR_SERVER sandbox  # or "production"
+
+# Application URLs
+npx convex env set SITE_URL http://localhost:3000
+npx convex env set VITE_CONVEX_SITE_URL https://your-deployment-name.convex.cloud
+```
+
+### Getting Required Values
+
+**GitHub OAuth**:
+1. Go to [GitHub Developer Settings](https://github.com/settings/developers)
+2. Create a new OAuth App
+3. Set Authorization callback URL: `http://localhost:3000/api/auth/callback/github`
+4. Copy Client ID and generate Client Secret
+
+**Google OAuth**:
+1. Go to [Google Cloud Console](https://console.cloud.google.com/)
+2. Create a new project or select existing one
+3. Enable Google+ API
+4. Create OAuth 2.0 credentials
+5. Set authorized redirect URI: `http://localhost:3000/api/auth/callback/google`
+6. Copy Client ID and Client Secret
+
+**Polar Integration**:
+1. Create an account at [Polar.sh](https://polar.sh/)
+2. Create your products/subscriptions
+3. Get your Organization Token from Polar settings
+4. Generate a Webhook Secret for webhook handling
+
+**Resend (Email)**:
+1. Create an account at [Resend](https://resend.com/)
+2. Get your API key from the dashboard
+
+### Development Workflow
+
+1. **Start development server**:
+```bash
+npx convex dev
+```
+
+2. **Run your application**:
+```bash
+pnpm dev
+```
+
+### Environment Management
+
+**List all environment variables**:
+```bash
+npx convex env list
+```
+
+**Remove an environment variable**:
+```bash
+npx convex env remove VARIABLE_NAME
+```
+
+**Pull environment variables to local file**:
+```bash
+npx convex env pull .env.local
+```
+
+### Production Deployment
+
+1. **Update production environment variables**:
+```bash
+npx convex env set --prod VARIABLE_NAME value
+```
+
+2. **Deploy to production**:
+```bash
+npx convex deploy
+```
 
 
 ## Shadcn

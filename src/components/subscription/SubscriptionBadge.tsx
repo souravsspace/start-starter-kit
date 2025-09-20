@@ -14,8 +14,6 @@ export function SubscriptionBadge() {
 				return "secondary";
 			case "professional":
 				return "default";
-			case "premiumLifetime":
-				return "destructive";
 			default:
 				return "secondary";
 		}

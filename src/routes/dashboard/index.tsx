@@ -1,20 +1,73 @@
 import { Button } from "@/components/ui/button";
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { signOut, useSession } from "@/integrations/better-auth/client";
-import { Link } from "@tanstack/react-router";
-import { createFileRoute } from "@tanstack/react-router";
+import { Link, createFileRoute } from "@tanstack/react-router";
 import { SubscriptionBadge } from "@/components/subscription/SubscriptionBadge";
+import { Confetti } from "@/components/magic-ui/confetti";
+import { useEffect, useRef } from "react";
 
 export const Route = createFileRoute("/dashboard/")({
   component: RouteComponent,
+  validateSearch: (search: Record<string, unknown>) => {
+    return {
+      success: typeof search.success === "string" ? search.success : undefined,
+      customer_session_token: typeof search.customer_session_token === "string" ? search.customer_session_token : undefined,
+      plan: typeof search.plan === "string" ? search.plan : undefined,
+    };
+  },
 });
 
 function RouteComponent() {
   const { data: session } = useSession();
+  const search = Route.useSearch();
+  const confettiRef = useRef<any>(null);
+
+  useEffect(() => {
+    // Check if we should celebrate - either success=true or customer_session_token present
+    const shouldCelebrate = search.success === "true" || search.customer_session_token;
+    
+    if (shouldCelebrate) {
+      // Trigger confetti celebration
+      setTimeout(() => {
+        confettiRef.current?.fire({
+          particleCount: 150,
+          spread: 70,
+          origin: { y: 0.6 },
+        });
+      }, 500);
+
+      // Force refresh subscription data by reloading the page
+      // This ensures the subscription state is updated after payment
+      setTimeout(() => {
+        // Clean up the URL by removing success, customer_session_token, and plan parameters
+        const url = new URL(window.location.href);
+        url.searchParams.delete("success");
+        url.searchParams.delete("customer_session_token");
+        url.searchParams.delete("plan");
+        window.history.replaceState({}, "", url.toString());
+        
+        // Force page reload to refresh subscription data
+        window.location.reload();
+      }, 2000);
+    }
+  }, [search.success, search.customer_session_token]);
 
   return (
     <div className="mx-auto max-w-7xl p-6 space-y-6">
+      {/* Confetti celebration for successful subscription */}
+      <Confetti
+        ref={confettiRef}
+        className="absolute left-0 top-0 z-50 size-full pointer-events-none"
+        manualstart={true}
+      />
+
       <div className="flex items-center justify-between">
         <div>
           <h1 className="text-3xl font-bold">Dashboard</h1>
@@ -49,7 +102,11 @@ function RouteComponent() {
               </div>
               <div className="flex justify-between">
                 <span>Email Verified:</span>
-                <Badge variant={session?.user?.emailVerified ? "default" : "secondary"}>
+                <Badge
+                  variant={
+                    session?.user?.emailVerified ? "default" : "secondary"
+                  }
+                >
                   {session?.user?.emailVerified ? "Verified" : "Pending"}
                 </Badge>
               </div>

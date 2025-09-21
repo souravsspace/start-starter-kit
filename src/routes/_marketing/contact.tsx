@@ -11,6 +11,7 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { Card } from "@/components/ui/card";
+import { usePostHogTracking } from "@/hooks/use-posthog-tracking";
 
 // TODO: Add form handling and submission logic
 
@@ -19,6 +20,8 @@ export const Route = createFileRoute("/_marketing/contact")({
 });
 
 function RouteComponent() {
+  const { trackFormSubmit, trackButtonClick, trackPageView } = usePostHogTracking();
+  
   return (
     <section className="py-32">
       <div className="mx-auto max-w-3xl px-8 lg:px-0">
@@ -99,7 +102,7 @@ function RouteComponent() {
               />
             </div>
 
-            <Button>Send Message</Button>
+            <Button onClick={() => trackFormSubmit("contact_form")}>Send Message</Button>
           </form>
         </Card>
       </div>

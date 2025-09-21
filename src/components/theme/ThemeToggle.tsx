@@ -1,17 +1,23 @@
 import { Button } from "@/components/ui/button";
 import { useTheme } from "@/components/theme/ThemeProvider";
 import { Moon, Sun } from "lucide-react";
+import { usePostHogTracking } from "@/hooks/use-posthog-tracking";
 
 // FIXME: fix the toggle is late
 export function ThemeToggle() {
   const { theme, setTheme } = useTheme();
+  const { trackFeatureUsage } = usePostHogTracking();
   return (
     <Button
       variant="ghost"
       type="button"
       size="icon"
       aria-label="Toggle theme"
-      onClick={() => setTheme(theme === "dark" ? "light" : "dark")}
+      onClick={() => {
+        const newTheme = theme === "dark" ? "light" : "dark";
+        trackFeatureUsage("theme_toggle", { from: theme, to: newTheme });
+        setTheme(newTheme);
+      }}
       className="relative size-7"
     >
       <span className="sr-only">Toggle theme</span>

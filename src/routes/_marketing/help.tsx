@@ -12,6 +12,7 @@ import {
 } from "@/components/ui/select";
 import { Card } from "@/components/ui/card";
 import { appConfig } from "@/app-config";
+import { usePostHogTracking } from "@/hooks/use-posthog-tracking";
 
 // TODO: Add form handling and submission logic
 
@@ -20,6 +21,8 @@ export const Route = createFileRoute("/_marketing/help")({
 });
 
 function RouteComponent() {
+  const { trackButtonClick, trackFormSubmit, trackPageView } = usePostHogTracking();
+  
   return (
     <section className="py-32">
       <div className="mx-auto max-w-3xl px-8 lg:px-0">
@@ -70,16 +73,16 @@ function RouteComponent() {
               </p>
 
               <div className="space-y-3">
-                <Button variant="outline" className="w-full justify-start">
+                <Button variant="outline" className="w-full justify-start" onClick={() => trackButtonClick("help_documentation_button")}>
                   Documentation
                 </Button>
-                <Button variant="outline" className="w-full justify-start">
+                <Button variant="outline" className="w-full justify-start" onClick={() => trackButtonClick("help_api_reference_button")}>
                   API Reference
                 </Button>
-                <Button variant="outline" className="w-full justify-start">
+                <Button variant="outline" className="w-full justify-start" onClick={() => trackButtonClick("help_community_forum_button")}>
                   Community Forum
                 </Button>
-                <Button variant="outline" className="w-full justify-start">
+                <Button variant="outline" className="w-full justify-start" onClick={() => trackButtonClick("help_video_tutorials_button")}>
                   Video Tutorials
                 </Button>
               </div>
@@ -166,7 +169,7 @@ function RouteComponent() {
               </Select>
             </div>
 
-            <Button>Submit Help Request</Button>
+            <Button onClick={() => trackFormSubmit("help_request_form")}>Submit Help Request</Button>
           </form>
         </Card>
 

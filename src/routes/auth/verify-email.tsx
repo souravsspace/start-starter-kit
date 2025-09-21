@@ -11,6 +11,7 @@ import {
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Loader2 } from "lucide-react";
+import { usePostHogTracking } from "@/hooks/use-posthog-tracking";
 
 export const Route = createFileRoute("/auth/verify-email")({
   component: RouteComponent,
@@ -28,18 +29,23 @@ function RouteComponent() {
   const search = Route.useSearch();
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const { trackEvent, trackButtonClick, trackPageView } = usePostHogTracking();
 
   useEffect(() => {
+    trackPageView({ page: "verify_email", hasToken: !!search.token, hasEmail: !!search.email });
+    
     const verifyEmail = async () => {
       try {
         // Check if user is authenticated
         if (!session) {
+          trackEvent("email_verification_not_authenticated");
           navigate({ to: "/auth/login" });
           return;
         }
 
         // Check if email is already verified
         if (session.user?.emailVerified) {
+          trackEvent("email_verification_already_verified");
           navigate({ to: "/dashboard" });
           return;
         }
@@ -51,6 +57,7 @@ function RouteComponent() {
           if (updatedSession.data?.user?.emailVerified) {
             clearInterval(checkInterval);
             setIsLoading(false);
+            trackEvent("email_verification_success");
             navigate({ to: "/dashboard" });
           }
         }, 3000);
@@ -62,10 +69,12 @@ function RouteComponent() {
           setError(
             "Verification timeout. Please check your email and try again.",
           );
+          trackEvent("email_verification_timeout");
         }, 300000);
 
         return () => clearInterval(checkInterval);
       } catch (err) {
+        trackEvent("email_verification_error", { error: err instanceof Error ? err.message : 'unknown' });
         setError("Failed to verify email. Please try again.");
         setIsLoading(false);
       }
@@ -101,7 +110,10 @@ function RouteComponent() {
               </p>
               <Button
                 variant="outline"
-                onClick={() => navigate({ to: "/dashboard" })}
+                onClick={() => {
+                  trackButtonClick("verify_email_return_dashboard");
+                  navigate({ to: "/dashboard" });
+                }}
               >
                 Return to Dashboard
               </Button>
@@ -124,11 +136,17 @@ function RouteComponent() {
             <div className="flex gap-2">
               <Button
                 variant="outline"
-                onClick={() => navigate({ to: "/auth/verify-email", replace: true })}
+                onClick={() => {
+                  trackButtonClick("verify_email_try_again");
+                  navigate({ to: "/auth/verify-email", replace: true });
+                }}
               >
                 Try Again
               </Button>
-              <Button onClick={() => navigate({ to: "/dashboard" })}>
+              <Button onClick={() => {
+                trackButtonClick("verify_email_error_return_dashboard");
+                navigate({ to: "/dashboard" });
+              }}>
                 Return to Dashboard
               </Button>
             </div>

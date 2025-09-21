@@ -28,12 +28,12 @@ const config = defineConfig({
       // Fix for @convex-dev/polar polyfill module resolution issue
       "@convex-dev/polar/client/polyfill": path.resolve(
         __dirname,
-        "src/scripts/polar-polyfill.ts"
+        "src/scripts/polar-polyfill.ts",
       ),
       // Additional aliases for different import patterns
       "@convex-dev/polar/dist/esm/client/polyfill": path.resolve(
         __dirname,
-        "src/scripts/polar-polyfill.ts"
+        "src/scripts/polar-polyfill.ts",
       ),
     },
   },
@@ -45,7 +45,7 @@ const config = defineConfig({
   },
   ssr: {
     // Handle SSR module resolution for @convex-dev/polar
-    noExternal: ["@convex-dev/polar"],
+    noExternal: ["@convex-dev/polar", "posthog-js", "posthog-js/react"],
   },
   server: {
     proxy: {

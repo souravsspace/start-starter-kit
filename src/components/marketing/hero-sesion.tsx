@@ -4,6 +4,7 @@ import { Button } from "@/components/ui/button";
 import { Link } from "@tanstack/react-router";
 import { ArrowRight, ChevronRight } from "lucide-react";
 import { Icons } from "../Icons";
+import { usePostHogTracking } from "@/hooks/use-posthog-tracking";
 
 const transitionVariants = {
 	item: {
@@ -26,6 +27,8 @@ const transitionVariants = {
 };
 
 export default function HeroSection() {
+	const { trackButtonClick, trackPageView } = usePostHogTracking();
+	
 	return (
 		<main className="overflow-hidden">
 			<div
@@ -147,7 +150,7 @@ export default function HeroSection() {
 										size="lg"
 										className="rounded-xl px-5 text-base"
 									>
-										<Link to="/auth/register">
+										<Link to="/auth/register" onClick={() => trackButtonClick("hero_primary_cta", { text: "Start Building" })}>
 											<span className="text-nowrap">Start Building</span>
 										</Link>
 									</Button>
@@ -159,7 +162,7 @@ export default function HeroSection() {
 									variant="ghost"
 									className="h-10.5 rounded-xl px-5"
 								>
-									<Link to="/auth/register">
+									<Link to="/auth/register" onClick={() => trackButtonClick("hero_secondary_cta", { text: "Request a demo" })}>
 										<span className="text-nowrap">Request a demo</span>
 									</Link>
 								</Button>
@@ -206,6 +209,7 @@ export default function HeroSection() {
 					<div className="absolute inset-0 z-10 flex scale-95 items-center justify-center opacity-0 duration-500 group-hover:scale-100 group-hover:opacity-100">
 						<Link
 							to="/auth/register"
+							onClick={() => trackButtonClick("hero_social_proof_cta")}
 							className="block text-sm duration-150 hover:opacity-75"
 						>
 							<span>Get started</span>

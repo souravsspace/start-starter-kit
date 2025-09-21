@@ -6,6 +6,7 @@ import { Link } from "@tanstack/react-router";
 import { Icons } from "@/components/Icons";
 import { useSession } from "@/integrations/better-auth/client";
 import { marketingHeaderMenuItems as menuItems } from "@/app-config";
+import { usePostHogTracking } from "@/hooks/use-posthog-tracking";
 
 export const Header = () => {
   const [menuState, setMenuState] = React.useState(false);
@@ -13,6 +14,7 @@ export const Header = () => {
 
   const { data: sessoin } = useSession();
   const isLoggedIn = !!sessoin && !!sessoin.user;
+  const { trackButtonClick, trackNavigation } = usePostHogTracking();
 
   React.useEffect(() => {
     const handleScroll = () => {
@@ -41,12 +43,16 @@ export const Header = () => {
                 to="/"
                 aria-label="home"
                 className="flex items-center space-x-2"
+                onClick={() => trackButtonClick("header_logo_click")}
               >
                 <Icons.logo className="size-6 sm:size-7" />
               </Link>
 
               <button
-                onClick={() => setMenuState(!menuState)}
+                onClick={() => {
+                  trackButtonClick("header_mobile_menu_toggle", { state: menuState ? "closing" : "opening" });
+                  setMenuState(!menuState);
+                }}
                 aria-label={menuState == true ? "Close Menu" : "Open Menu"}
                 className="relative z-20 -m-2.5 -mr-4 block cursor-pointer p-2.5 lg:hidden"
               >
@@ -62,6 +68,7 @@ export const Header = () => {
                     <Link
                       to={item.href}
                       className="text-muted-foreground hover:text-accent-foreground block duration-150"
+                      onClick={() => trackButtonClick("header_navigation_link", { item: item.name, href: item.href })}
                     >
                       <span>{item.name}</span>
                     </Link>
@@ -78,6 +85,7 @@ export const Header = () => {
                       <Link
                         to={item.href}
                         className="text-muted-foreground hover:text-accent-foreground block duration-150"
+                        onClick={() => trackButtonClick("header_mobile_navigation_link", { item: item.name, href: item.href })}
                       >
                         <span>{item.name}</span>
                       </Link>
@@ -92,7 +100,7 @@ export const Header = () => {
                     size="sm"
                     className={cn(isScrolled && "lg:hidden")}
                   >
-                    <Link to="/dashboard">
+                    <Link to="/dashboard" onClick={() => trackButtonClick("header_dashboard_button")}>
                       <span>Dashboard</span>
                     </Link>
                   </Button>
@@ -104,7 +112,7 @@ export const Header = () => {
                       size="sm"
                       className={cn(isScrolled && "lg:hidden")}
                     >
-                      <Link to="/auth/login">
+                      <Link to="/auth/login" onClick={() => trackButtonClick("header_login_button")}>
                         <span>Login</span>
                       </Link>
                     </Button>
@@ -113,7 +121,7 @@ export const Header = () => {
                       size="sm"
                       className={cn(isScrolled && "lg:hidden")}
                     >
-                      <Link to="/auth/register">
+                      <Link to="/auth/register" onClick={() => trackButtonClick("header_signup_button")}>
                         <span>Sign Up</span>
                       </Link>
                     </Button>
@@ -125,7 +133,7 @@ export const Header = () => {
                   size="sm"
                   className={cn(isScrolled ? "lg:inline-flex" : "hidden")}
                 >
-                  <Link to={isLoggedIn ? "/dashboard" : "/auth/register"}>
+                  <Link to={isLoggedIn ? "/dashboard" : "/auth/register"} onClick={() => trackButtonClick("header_primary_cta", { text: isLoggedIn ? "Dashboard" : "Get Started" })}>
                     <span>{isLoggedIn ? "Dashboard" : "Get Started"}</span>
                   </Link>
                 </Button>

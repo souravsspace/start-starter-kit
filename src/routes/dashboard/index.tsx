@@ -14,6 +14,7 @@ import {
   signOut,
   useSession,
 } from "@/integrations/better-auth/client";
+import { usePostHogTracking } from "@/hooks/use-posthog-tracking";
 import { Link, createFileRoute, useNavigate } from "@tanstack/react-router";
 import { useEffect, useRef, useState } from "react";
 import { toast } from "sonner";
@@ -38,17 +39,24 @@ function RouteComponent() {
   const search = Route.useSearch();
   const confettiRef = useRef<any>(null);
   const [isSendingEmail, setIsSendingEmail] = useState(false);
+  const { trackEvent, trackButtonClick, identifyUser, trackConversion, trackPageView } = usePostHogTracking();
 
   const handleSendVerificationEmail = async () => {
     if (!session?.user?.email) return;
 
+    trackButtonClick("send_verification_email");
     setIsSendingEmail(true);
     try {
       await sendVerificationEmail({ email: session.user.email });
+      trackEvent("verification_email_sent", { email: session.user.email });
       toast.success("Verification email sent! Please check your inbox.");
       // Navigate to verification page using TanStack router
       navigate({ to: "/auth/verify-email" });
     } catch (error) {
+      trackEvent("verification_email_failed", { 
+        email: session.user.email,
+        error: error instanceof Error ? error.message : 'unknown' 
+      });
       console.error(
         "Failed to send verification email to",
         session.user.email,
@@ -61,11 +69,31 @@ function RouteComponent() {
   };
 
   useEffect(() => {
+    // Track page view
+    trackPageView({ page: "dashboard" });
+    
+    // Identify user if session exists
+    if (session?.user?.id && session?.user?.email) {
+      identifyUser(session.user.id, {
+        email: session.user.email,
+        name: session.user.name,
+        emailVerified: session.user.emailVerified,
+        plan: session.user.plan,
+      });
+    }
+    
     // Check if we should celebrate - either success=true or customer_session_token present
     const shouldCelebrate =
       search.success === "true" || search.customer_session_token;
 
     if (shouldCelebrate) {
+      // Track successful subscription conversion
+      trackConversion("subscription_purchase", undefined, {
+        plan: search.plan,
+        success: search.success,
+        hasCustomerSession: !!search.customer_session_token,
+      });
+      
       // Trigger confetti celebration
       setTimeout(() => {
         confettiRef.current?.fire({
@@ -87,7 +115,7 @@ function RouteComponent() {
         }, 2000);
       }, 2000);
     }
-  }, [search.success, search.customer_session_token]);
+  }, [search.success, search.customer_session_token, session]);
 
   return (
     <div className="mx-auto max-w-7xl p-6 space-y-6">
@@ -110,7 +138,10 @@ function RouteComponent() {
           <Button asChild variant="outline">
             <Link to="/dashboard/settings">Settings</Link>
           </Button>
-          <Button onClick={() => signOut()}>Logout</Button>
+          <Button onClick={() => {
+            trackButtonClick("logout_button");
+            signOut();
+          }}>Logout</Button>
         </div>
       </div>
 

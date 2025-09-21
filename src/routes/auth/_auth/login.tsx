@@ -11,6 +11,7 @@ import {
 } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
 import { signIn } from "@/integrations/better-auth/client";
+import { usePostHogTracking } from "@/hooks/use-posthog-tracking";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { Link, createFileRoute } from "@tanstack/react-router";
 import { useState } from "react";
@@ -32,6 +33,7 @@ type TLoginSchema = z.infer<typeof loginSchema>;
 function RouteComponent() {
 	const navigate = Route.useNavigate();
 	const [isSubmitting, setIsSubmitting] = useState(false);
+	const { trackEvent, trackFormSubmit, trackButtonClick, trackError } = usePostHogTracking();
 
 	const form = useForm<TLoginSchema>({
 		resolver: zodResolver(loginSchema),
@@ -45,6 +47,7 @@ function RouteComponent() {
 		form.formState.isSubmitting || form.formState.isLoading || isSubmitting;
 
 	const onSubmit = async (data: TLoginSchema) => {
+		trackFormSubmit("login_form", { email: data.email });
 		const { error } = await signIn.email(
 			{
 				email: data.email,
@@ -56,6 +59,7 @@ function RouteComponent() {
 				},
 				onSuccess: async (ctx) => {
 					setIsSubmitting(false);
+					trackEvent("login_success", { method: "email", email: data.email });
 					if (ctx.data.twoFactorRedirect) {
 						toast.success("Please complete the 2FA verification.");
 						await navigate({ to: "/verify-2fa" });
@@ -66,6 +70,11 @@ function RouteComponent() {
 				},
 				onError: (ctx) => {
 					setIsSubmitting(false);
+					trackError("login_failed", { 
+						method: "email", 
+						error: ctx.error.message,
+						email: data.email 
+					});
 					console.error("ERROR: ", ctx.error.message);
 					toast.error("Something went wrong. Please try again.");
 				},
@@ -75,6 +84,7 @@ function RouteComponent() {
 	}
 
 	const onGoogleSignIn = async () => {
+		trackButtonClick("social_login_button", { provider: "google" });
 		const { error } = await signIn.social(
 			{ provider: "google" },
 			{
@@ -83,10 +93,12 @@ function RouteComponent() {
 				},
 				onSuccess: async () => {
 					setIsSubmitting(false);
+					trackEvent("login_success", { method: "google" });
 					await navigate({ to: "/dashboard" });
 				},
 				onError: (ctx) => {
 					setIsSubmitting(false);
+					trackError("login_failed", { method: "google", error: ctx.error.message });
 					console.error("ERROR: ", ctx.error.message);
 					toast.error("Something went wrong. Please try again.");
 				},
@@ -96,6 +108,7 @@ function RouteComponent() {
 	}
 
 	const onGithubSignIn = async () => {
+		trackButtonClick("social_login_button", { provider: "github" });
 		const { error } = await signIn.social(
 			{ provider: "github" },
 			{
@@ -104,10 +117,12 @@ function RouteComponent() {
 				},
 				onSuccess: async () => {
 					setIsSubmitting(false);
+					trackEvent("login_success", { method: "github" });
 					await navigate({ to: "/dashboard" });
 				},
 				onError: (ctx) => {
 					setIsSubmitting(false);
+					trackError("login_failed", { method: "github", error: ctx.error.message });
 					console.error("ERROR: ", ctx.error.message);
 					toast.error("Something went wrong. Please try again.");
 				},

@@ -8,6 +8,7 @@ import {
   CardTitle,
 } from "@/components/ui/card";
 import { useSubscription } from "@/hooks/use-subscription";
+import { usePostHogTracking } from "@/hooks/use-posthog-tracking";
 import { api } from "convex/_generated/api";
 import type { SubscriptionPlan } from "convex/polar";
 import { useQuery } from "convex/react";
@@ -23,6 +24,7 @@ export function SubscriptionManager() {
     getPlanPrice,
     getCustomerPortalUrl,
   } = useSubscription();
+  const { trackEvent, trackButtonClick, trackConversion } = usePostHogTracking();
   const subscriptionDetails = useQuery(api.polar.getSubscriptionDetails);
   const [customerPortalUrl, setCustomerPortalUrl] = useState<string | null>(null);
   const [isLoadingPortal, setIsLoadingPortal] = useState(false);
@@ -225,7 +227,14 @@ export function SubscriptionManager() {
                         className="w-full"
                         variant={isCurrentPlan ? "outline" : "default"}
                         disabled={!canChange || isLoading || isCurrentPlan || subscriptionDetails?.cancelAtPeriodEnd}
-                        onClick={() => handlePlanChange(plan)}
+                        onClick={() => {
+                          trackButtonClick(`plan_change_button`, { 
+                            from: currentPlan, 
+                            to: plan,
+                            action: subscriptionStatus.canUpgradeTo.includes(plan) ? "upgrade" : "downgrade"
+                          });
+                          handlePlanChange(plan);
+                        }}
                       >
                         {isLoading && (
                           <Loader2 className="mr-2 h-4 w-4 animate-spin" />
@@ -261,12 +270,17 @@ export function SubscriptionManager() {
           <CardContent>
             <Button 
               onClick={async () => {
+                trackButtonClick("customer_portal_button");
                 setIsLoadingPortal(true);
                 try {
                   const url = await getCustomerPortalUrl();
                   setCustomerPortalUrl(url);
+                  trackEvent("customer_portal_opened");
                   window.open(url, "_blank", "noopener noreferrer");
                 } catch (error) {
+                  trackEvent("customer_portal_failed", { 
+                    error: error instanceof Error ? error.message : 'unknown' 
+                  });
                   console.error("Failed to get customer portal URL:", error);
                 } finally {
                   setIsLoadingPortal(false);

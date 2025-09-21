@@ -6,6 +6,7 @@ import { useAction, useQuery } from "convex/react";
 import { Check, Loader2 } from "lucide-react";
 import { useState } from "react";
 import { useSubscription } from "@/hooks/use-subscription";
+import { usePostHogTracking } from "@/hooks/use-posthog-tracking";
 
 export const Route = createFileRoute("/_marketing/pricing")({
   component: RouteComponent,
@@ -18,12 +19,16 @@ function RouteComponent() {
   const generateCheckoutLink = useAction(api.polar.generateCheckoutLink);
   const { handlePlanChange, isLoading } = useSubscription();
   const [loadingPlan, setLoadingPlan] = useState<string | null>(null);
+  const { trackEvent, trackButtonClick, trackPageView } = usePostHogTracking();
 
   /**
    * Handle checkout process for subscription plans
    */
   const handleCheckout = async (plan: "professional") => {
+    trackButtonClick("pricing_checkout_button", { plan });
+    
     if (!subscriptionStatus?.isAuthenticated) {
+      trackEvent("pricing_redirect_to_login", { plan });
       navigate({ to: "/auth/login" });
       return;
     }
@@ -40,10 +45,19 @@ function RouteComponent() {
       });
 
       if (result.url) {
+        trackEvent("pricing_checkout_initiated", { 
+          plan,
+          price: 5,
+          currency: "USD"
+        });
         // For external checkout URLs, we still need to use window.location
         window.location.href = result.url;
       }
     } catch (error) {
+      trackEvent("pricing_checkout_failed", { 
+        plan,
+        error: error instanceof Error ? error.message : 'unknown'
+      });
       console.error("Checkout error:", error);
       alert(
         error instanceof Error ? error.message : "Failed to initiate checkout",
@@ -115,14 +129,22 @@ function RouteComponent() {
                 className="w-full"
                 disabled={getButtonState("starter").disabled || loadingPlan === "starter" || isLoading}
                 onClick={async () => {
+                  trackButtonClick("pricing_plan_button", { plan: "starter" });
                   if (!subscriptionStatus?.isAuthenticated) {
+                    trackEvent("pricing_redirect_to_register", { plan: "starter" });
                     navigate({ to: "/auth/register" });
                   } else if (!subscriptionDetails?.cancelAtPeriodEnd && subscriptionStatus.canDowngradeTo.includes("starter")) {
                     // Handle downgrade to starter
                     setLoadingPlan("starter");
                     try {
+                      trackEvent("pricing_downgrade_initiated", { from: subscriptionStatus.currentPlan, to: "starter" });
                       await handlePlanChange("starter");
                     } catch (error) {
+                      trackEvent("pricing_downgrade_failed", { 
+                        from: subscriptionStatus.currentPlan, 
+                        to: "starter",
+                        error: error instanceof Error ? error.message : 'unknown'
+                      });
                       console.error("Downgrade error:", error);
                       alert(
                         error instanceof Error 

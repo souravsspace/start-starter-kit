@@ -16,6 +16,7 @@ import React, {
 } from "react";
 
 import { Button } from "@/components/ui/button";
+import { usePostHogTracking } from "@/hooks/use-posthog-tracking";
 
 type Api = {
   fire: (options?: ConfettiOptions) => void;
@@ -117,7 +118,10 @@ const ConfettiButtonComponent = ({
   children,
   ...props
 }: ConfettiButtonProps) => {
+  const { trackButtonClick } = usePostHogTracking();
+  
   const handleClick = async (event: React.MouseEvent<HTMLButtonElement>) => {
+    trackButtonClick("confetti_button", { button_text: children?.toString() });
     try {
       const rect = event.currentTarget.getBoundingClientRect();
       const x = rect.left + rect.width / 2;

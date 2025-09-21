@@ -11,6 +11,7 @@ import {
 } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
 import { signIn, signUp } from "@/integrations/better-auth/client";
+import { usePostHogTracking } from "@/hooks/use-posthog-tracking";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { Link, createFileRoute } from "@tanstack/react-router";
 import { useState } from "react";
@@ -34,6 +35,7 @@ type TRegisterSchema = z.infer<typeof registerSchema>;
 function RouteComponent() {
 	const navigate = Route.useNavigate();
 	const [isSubmitting, setIsSubmitting] = useState(false);
+	const { trackEvent, trackFormSubmit, trackButtonClick, trackError } = usePostHogTracking();
 
 	const form = useForm<TRegisterSchema>({
 		resolver: zodResolver(registerSchema),
@@ -49,6 +51,11 @@ function RouteComponent() {
 		form.formState.isSubmitting || form.formState.isLoading || isSubmitting;
 
 	const onSubmit = async (data: TRegisterSchema) => {
+		trackFormSubmit("register_form", { 
+			email: data.email, 
+			firstname: data.firstname, 
+			lastname: data.lastname 
+		});
 		try {
 			const result = await signUp.email(
 				{
@@ -62,11 +69,21 @@ function RouteComponent() {
 					},
 					onSuccess: async () => {
 						setIsSubmitting(false);
+						trackEvent("register_success", { 
+							method: "email", 
+							email: data.email,
+							name: `${data.firstname} ${data.lastname}`
+						});
 						toast.success("Registered successfully!");
 						await navigate({ to: "/dashboard" });
 					},
 					onError: (ctx) => {
 						setIsSubmitting(false);
+						trackError("register_failed", { 
+							method: "email", 
+							error: ctx.error?.message,
+							email: data.email 
+						});
 						console.error("ERROR: ", ctx.error);
 						toast.error(
 							ctx.error.message || "Something went wrong. Please try again.",
@@ -76,17 +93,28 @@ function RouteComponent() {
 			)
 
 			if (result.error) {
+				trackError("register_failed", { 
+					method: "email", 
+					error: result.error.message,
+					email: data.email 
+				});
 				console.error("Signup error:", result.error);
 				toast.error(result.error.message || "Registration failed");
 			}
 		} catch (err) {
 			setIsSubmitting(false);
+			trackError("register_failed", { 
+				method: "email", 
+				error: "network_error",
+				email: data.email 
+			});
 			console.error("Signup catch error:", err);
 			toast.error("Network error. Please try again.");
 		}
 	}
 
 	const onGoogleSignIn = async () => {
+		trackButtonClick("social_register_button", { provider: "google" });
 		const { error } = await signIn.social(
 			{ provider: "google" },
 			{
@@ -95,10 +123,12 @@ function RouteComponent() {
 				},
 				onSuccess: async () => {
 					setIsSubmitting(false);
+					trackEvent("register_success", { method: "google" });
 					await navigate({ to: "/dashboard" });
 				},
 				onError: (ctx) => {
 					setIsSubmitting(false);
+					trackError("register_failed", { method: "google", error: ctx.error.message });
 					console.error("ERROR: ", ctx.error.message);
 					toast.error("Something went wrong. Please try again.");
 				},
@@ -108,6 +138,7 @@ function RouteComponent() {
 	}
 
 	const onGithubSignIn = async () => {
+		trackButtonClick("social_register_button", { provider: "github" });
 		const { error } = await signIn.social(
 			{ provider: "github" },
 			{
@@ -116,10 +147,12 @@ function RouteComponent() {
 				},
 				onSuccess: async () => {
 					setIsSubmitting(false);
+					trackEvent("register_success", { method: "github" });
 					await navigate({ to: "/dashboard" });
 				},
 				onError: (ctx) => {
 					setIsSubmitting(false);
+					trackError("register_failed", { method: "github", error: ctx.error.message });
 					console.error("ERROR: ", ctx.error.message);
 					toast.error("Something went wrong. Please try again.");
 				},

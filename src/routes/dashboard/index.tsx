@@ -1,3 +1,6 @@
+import { Confetti } from "@/components/magic-ui/confetti";
+import { SubscriptionBadge } from "@/components/subscription/SubscriptionBadge";
+import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import {
   Card,
@@ -6,11 +9,12 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
-import { Badge } from "@/components/ui/badge";
-import { signOut, useSession, sendVerificationEmail } from "@/integrations/better-auth/client";
+import {
+  sendVerificationEmail,
+  signOut,
+  useSession,
+} from "@/integrations/better-auth/client";
 import { Link, createFileRoute, useNavigate } from "@tanstack/react-router";
-import { SubscriptionBadge } from "@/components/subscription/SubscriptionBadge";
-import { Confetti } from "@/components/magic-ui/confetti";
 import { useEffect, useRef, useState } from "react";
 import { toast } from "sonner";
 
@@ -19,7 +23,10 @@ export const Route = createFileRoute("/dashboard/")({
   validateSearch: (search: Record<string, unknown>) => {
     return {
       success: typeof search.success === "string" ? search.success : undefined,
-      customer_session_token: typeof search.customer_session_token === "string" ? search.customer_session_token : undefined,
+      customer_session_token:
+        typeof search.customer_session_token === "string"
+          ? search.customer_session_token
+          : undefined,
       plan: typeof search.plan === "string" ? search.plan : undefined,
     };
   },
@@ -34,15 +41,20 @@ function RouteComponent() {
 
   const handleSendVerificationEmail = async () => {
     if (!session?.user?.email) return;
-    
+
     setIsSendingEmail(true);
     try {
-      await sendVerificationEmail();
+      await sendVerificationEmail({ email: session.user.email });
       toast.success("Verification email sent! Please check your inbox.");
       // Navigate to verification page using TanStack router
       navigate({ to: "/auth/verify-email" });
     } catch (error) {
-      console.error("Failed to send verification email to", session.user.email, ":", error);
+      console.error(
+        "Failed to send verification email to",
+        session.user.email,
+        ":",
+        error,
+      );
       toast.error("Failed to send verification email. Please try again.");
       setIsSendingEmail(false);
     }
@@ -50,8 +62,9 @@ function RouteComponent() {
 
   useEffect(() => {
     // Check if we should celebrate - either success=true or customer_session_token present
-    const shouldCelebrate = search.success === "true" || search.customer_session_token;
-    
+    const shouldCelebrate =
+      search.success === "true" || search.customer_session_token;
+
     if (shouldCelebrate) {
       // Trigger confetti celebration
       setTimeout(() => {
@@ -67,7 +80,7 @@ function RouteComponent() {
       setTimeout(() => {
         // Clean up the URL by removing success, customer_session_token, and plan parameters
         navigate({ to: "/dashboard", search: {}, replace: true });
-        
+
         // Force refresh subscription data by reloading the page
         setTimeout(() => {
           navigate({ to: "/dashboard", replace: true });

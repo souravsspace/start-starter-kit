@@ -16,7 +16,8 @@ import { requireMutationCtx } from "@convex-dev/better-auth/utils";
 import { components, internal } from "./_generated/api";
 import betterAuthSchema from "./betterAuth/schema";
 import { DataModel } from "./_generated/dataModel";
-import { query, QueryCtx } from "./_generated/server";
+import { mutation, query, QueryCtx } from "./_generated/server";
+import { v } from "convex/values";
 import { withoutSystemFields } from "convex-helpers";
 
 const authFunctions: AuthFunctions = internal.auth;
@@ -63,20 +64,34 @@ export const createAuth = (
     },
     emailVerification: {
       sendVerificationEmail: async ({ user, url }) => {
-        await sendEmailVerification(requireMutationCtx(ctx), {
-          to: user.email,
-          url,
-        });
+        try {
+          // Send email directly using the emails function
+          // Note: This requires the ctx to have mutation capabilities
+          await sendEmailVerification(ctx as any, {
+            to: user.email,
+            url,
+          });
+        } catch (error) {
+          console.error("Failed to send verification email:", error);
+          throw error;
+        }
       },
     },
     emailAndPassword: {
       enabled: true,
       requireEmailVerification: false,
       sendResetPassword: async ({ user, url }) => {
-        await sendResetPassword(requireMutationCtx(ctx), {
-          to: user.email,
-          url,
-        });
+        try {
+          // Send email directly using the emails function
+          // Note: This requires the ctx to have mutation capabilities
+          await sendResetPassword(ctx as any, {
+            to: user.email,
+            url,
+          });
+        } catch (error) {
+          console.error("Failed to send reset password email:", error);
+          throw error;
+        }
       },
     },
     socialProviders: {
@@ -146,6 +161,32 @@ export const getCurrentUser = query({
   args: {},
   handler: async (ctx) => {
     return safeGetUser(ctx);
+  },
+});
+
+export const sendVerificationEmail = mutation({
+  args: {
+    to: v.string(),
+    url: v.string(),
+  },
+  handler: async (ctx, args) => {
+    await sendEmailVerification(ctx, {
+      to: args.to,
+      url: args.url,
+    });
+  },
+});
+
+export const sendResetPasswordEmail = mutation({
+  args: {
+    to: v.string(),
+    url: v.string(),
+  },
+  handler: async (ctx, args) => {
+    await sendResetPassword(ctx, {
+      to: args.to,
+      url: args.url,
+    });
   },
 });
 

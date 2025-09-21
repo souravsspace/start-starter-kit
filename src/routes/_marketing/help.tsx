@@ -13,16 +13,87 @@ import {
 import { Card } from "@/components/ui/card";
 import { appConfig } from "@/app-config";
 import { usePostHogTracking } from "@/hooks/use-posthog-tracking";
-
-// TODO: Add form handling and submission logic
+import {
+  Form,
+  FormControl,
+  FormField,
+  FormItem,
+  FormLabel,
+  FormMessage,
+} from "@/components/ui/form";
+import { zodResolver } from "@hookform/resolvers/zod";
+import { useForm } from "react-hook-form";
+import { toast } from "sonner";
+import { z } from "zod";
+import { useMutation } from "convex/react";
+import { api } from "convex/_generated/api";
 
 export const Route = createFileRoute("/_marketing/help")({
   component: RouteComponent,
 });
 
+const helpSchema = z.object({
+  name: z.string().min(2, "Name must be at least 2 characters"),
+  email: z.string().email("Invalid email address"),
+  category: z.enum([
+    "getting-started",
+    "account",
+    "billing",
+    "technical",
+    "features",
+    "api",
+    "other",
+  ]),
+  subject: z.string().min(5, "Subject must be at least 5 characters"),
+  message: z.string().min(10, "Message must be at least 10 characters"),
+  priority: z.enum(["low", "medium", "high", "urgent"]),
+});
+
+type THelpSchema = z.infer<typeof helpSchema>;
+
 function RouteComponent() {
-  const { trackButtonClick, trackFormSubmit, trackPageView } = usePostHogTracking();
+  const { trackButtonClick, trackFormSubmit, trackPageView } =
+    usePostHogTracking();
   
+  trackPageView("help_page");
+  const submitSupportRequest = useMutation(api.support.submitSupportRequest);
+
+  const form = useForm<THelpSchema>({
+    resolver: zodResolver(helpSchema),
+    defaultValues: {
+      name: "",
+      email: "",
+      category: "other",
+      subject: "",
+      message: "",
+      priority: "medium",
+    },
+  });
+
+  const isLoading = form.formState.isSubmitting;
+
+  const onSubmit = async (data: THelpSchema) => {
+    trackFormSubmit("help_request_form", {
+      category: data.category,
+      priority: data.priority,
+    });
+
+    try {
+      await submitSupportRequest({
+        ...data,
+        type: "help",
+      });
+
+      toast.success(
+        "Help request submitted successfully! We'll get back to you soon.",
+      );
+      form.reset();
+    } catch (error) {
+      console.error("Failed to submit help request:", error);
+      toast.error("Failed to submit help request. Please try again.");
+    }
+  };
+
   return (
     <section className="py-32">
       <div className="mx-auto max-w-3xl px-8 lg:px-0">
@@ -73,16 +144,36 @@ function RouteComponent() {
               </p>
 
               <div className="space-y-3">
-                <Button variant="outline" className="w-full justify-start" onClick={() => trackButtonClick("help_documentation_button")}>
+                <Button
+                  variant="outline"
+                  className="w-full justify-start"
+                  onClick={() => trackButtonClick("help_documentation_button")}
+                >
                   Documentation
                 </Button>
-                <Button variant="outline" className="w-full justify-start" onClick={() => trackButtonClick("help_api_reference_button")}>
+                <Button
+                  variant="outline"
+                  className="w-full justify-start"
+                  onClick={() => trackButtonClick("help_api_reference_button")}
+                >
                   API Reference
                 </Button>
-                <Button variant="outline" className="w-full justify-start" onClick={() => trackButtonClick("help_community_forum_button")}>
+                <Button
+                  variant="outline"
+                  className="w-full justify-start"
+                  onClick={() =>
+                    trackButtonClick("help_community_forum_button")
+                  }
+                >
                   Community Forum
                 </Button>
-                <Button variant="outline" className="w-full justify-start" onClick={() => trackButtonClick("help_video_tutorials_button")}>
+                <Button
+                  variant="outline"
+                  className="w-full justify-start"
+                  onClick={() =>
+                    trackButtonClick("help_video_tutorials_button")
+                  }
+                >
                   Video Tutorials
                 </Button>
               </div>
@@ -99,78 +190,158 @@ function RouteComponent() {
             </p>
           </div>
 
-          <form className="mt-12 space-y-6 *:space-y-3">
-            <div>
-              <Label htmlFor="name">Full name</Label>
-              <Input type="text" id="name" required />
-            </div>
-
-            <div>
-              <Label htmlFor="email">Email</Label>
-              <Input type="email" id="email" required />
-            </div>
-
-            <div>
-              <Label htmlFor="category">Help Category</Label>
-              <Select>
-                <SelectTrigger>
-                  <SelectValue placeholder="Select a category" />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="getting-started">
-                    Getting Started
-                  </SelectItem>
-                  <SelectItem value="account">Account Management</SelectItem>
-                  <SelectItem value="billing">Billing & Payments</SelectItem>
-                  <SelectItem value="technical">Technical Issues</SelectItem>
-                  <SelectItem value="features">
-                    Features & Functionality
-                  </SelectItem>
-                  <SelectItem value="api">API & Integration</SelectItem>
-                  <SelectItem value="other">Other</SelectItem>
-                </SelectContent>
-              </Select>
-            </div>
-
-            <div>
-              <Label htmlFor="subject">Subject</Label>
-              <Input
-                type="text"
-                id="subject"
-                placeholder="Brief description of your question"
-                required
+          <Form {...form}>
+            <form
+              onSubmit={form.handleSubmit(onSubmit)}
+              className="mt-12 space-y-6 *:space-y-3"
+            >
+              <FormField
+                control={form.control}
+                name="name"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Full name</FormLabel>
+                    <FormControl>
+                      <Input placeholder="John Doe" {...field} />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
               />
-            </div>
 
-            <div>
-              <Label htmlFor="message">Message</Label>
-              <Textarea
-                id="message"
-                rows={5}
-                placeholder="Please provide detailed information about your question or issue..."
-                required
+              <FormField
+                control={form.control}
+                name="email"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Email</FormLabel>
+                    <FormControl>
+                      <Input
+                        type="email"
+                        placeholder="john@example.com"
+                        {...field}
+                      />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
               />
-            </div>
 
-            <div>
-              <Label htmlFor="priority">Priority Level</Label>
-              <Select>
-                <SelectTrigger>
-                  <SelectValue placeholder="Select priority level" />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="low">Low - General question</SelectItem>
-                  <SelectItem value="medium">Medium - Need guidance</SelectItem>
-                  <SelectItem value="high">High - Blocking issue</SelectItem>
-                  <SelectItem value="urgent">
-                    Urgent - Critical problem
-                  </SelectItem>
-                </SelectContent>
-              </Select>
-            </div>
+              <FormField
+                control={form.control}
+                name="category"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Help Category</FormLabel>
+                    <Select
+                      onValueChange={field.onChange}
+                      defaultValue={field.value}
+                    >
+                      <FormControl>
+                        <SelectTrigger>
+                          <SelectValue placeholder="Select a category" />
+                        </SelectTrigger>
+                      </FormControl>
+                      <SelectContent>
+                        <SelectItem value="getting-started">
+                          Getting Started
+                        </SelectItem>
+                        <SelectItem value="account">
+                          Account Management
+                        </SelectItem>
+                        <SelectItem value="billing">
+                          Billing & Payments
+                        </SelectItem>
+                        <SelectItem value="technical">
+                          Technical Issues
+                        </SelectItem>
+                        <SelectItem value="features">
+                          Features & Functionality
+                        </SelectItem>
+                        <SelectItem value="api">API & Integration</SelectItem>
+                        <SelectItem value="other">Other</SelectItem>
+                      </SelectContent>
+                    </Select>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
 
-            <Button onClick={() => trackFormSubmit("help_request_form")}>Submit Help Request</Button>
-          </form>
+              <FormField
+                control={form.control}
+                name="subject"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Subject</FormLabel>
+                    <FormControl>
+                      <Input
+                        placeholder="Brief description of your question"
+                        {...field}
+                      />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+
+              <FormField
+                control={form.control}
+                name="message"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Message</FormLabel>
+                    <FormControl>
+                      <Textarea
+                        rows={5}
+                        placeholder="Please provide detailed information about your question or issue..."
+                        {...field}
+                      />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+
+              <FormField
+                control={form.control}
+                name="priority"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Priority Level</FormLabel>
+                    <Select
+                      onValueChange={field.onChange}
+                      defaultValue={field.value}
+                    >
+                      <FormControl>
+                        <SelectTrigger>
+                          <SelectValue placeholder="Select priority level" />
+                        </SelectTrigger>
+                      </FormControl>
+                      <SelectContent>
+                        <SelectItem value="low">
+                          Low - General question
+                        </SelectItem>
+                        <SelectItem value="medium">
+                          Medium - Need guidance
+                        </SelectItem>
+                        <SelectItem value="high">
+                          High - Blocking issue
+                        </SelectItem>
+                        <SelectItem value="urgent">
+                          Urgent - Critical problem
+                        </SelectItem>
+                      </SelectContent>
+                    </Select>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+
+              <Button type="submit" disabled={isLoading}>
+                {isLoading ? "Submitting..." : "Submit Help Request"}
+              </Button>
+            </form>
+          </Form>
         </Card>
 
         <div className="mt-12 text-center">

@@ -4,6 +4,7 @@ import {
   Link,
   redirect,
 } from "@tanstack/react-router";
+import { usePostHogTracking } from "@/hooks/use-posthog-tracking";
 
 export const Route = createFileRoute("/auth/_auth")({
   beforeLoad: async ({ context }) => {
@@ -19,6 +20,9 @@ export const Route = createFileRoute("/auth/_auth")({
 });
 
 function RouteComponent() {
+  const { trackPageView } = usePostHogTracking();
+  
+  trackPageView("auth_layout_page");
   return (
     <div className="flex flex-col min-h-dvh items-center justify-center">
       <main className="min-w-lg">

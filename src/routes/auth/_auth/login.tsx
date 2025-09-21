@@ -33,7 +33,9 @@ type TLoginSchema = z.infer<typeof loginSchema>;
 function RouteComponent() {
 	const navigate = Route.useNavigate();
 	const [isSubmitting, setIsSubmitting] = useState(false);
-	const { trackEvent, trackFormSubmit, trackButtonClick, trackError } = usePostHogTracking();
+	const { trackEvent, trackFormSubmit, trackButtonClick, trackError, trackPageView } = usePostHogTracking();
+	
+	trackPageView("login_page");
 
 	const form = useForm<TLoginSchema>({
 		resolver: zodResolver(loginSchema),

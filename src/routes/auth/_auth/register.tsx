@@ -35,7 +35,9 @@ type TRegisterSchema = z.infer<typeof registerSchema>;
 function RouteComponent() {
 	const navigate = Route.useNavigate();
 	const [isSubmitting, setIsSubmitting] = useState(false);
-	const { trackEvent, trackFormSubmit, trackButtonClick, trackError } = usePostHogTracking();
+	const { trackEvent, trackFormSubmit, trackButtonClick, trackError, trackPageView } = usePostHogTracking();
+	
+	trackPageView("register_page");
 
 	const form = useForm<TRegisterSchema>({
 		resolver: zodResolver(registerSchema),

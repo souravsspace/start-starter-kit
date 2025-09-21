@@ -14,7 +14,7 @@ export const usePostHogTracking = () => {
 
   const trackEvent = (eventName: string, options?: TrackEventOptions) => {
     posthog.capture(eventName, options?.properties);
-    
+
     if (options?.groups) {
       Object.entries(options.groups).forEach(([groupType, groupKey]) => {
         posthog.group(groupType, groupKey, options?.properties);
@@ -34,46 +34,74 @@ export const usePostHogTracking = () => {
     posthog.capture("$pageview", properties);
   };
 
-  const trackButtonClick = (buttonName: string, properties?: Record<string, any>) => {
+  const trackButtonClick = (
+    buttonName: string,
+    properties?: Record<string, any>,
+  ) => {
     trackEvent("button_clicked", {
-      button_name: buttonName,
-      ...properties,
+      properties: {
+        button_name: buttonName,
+        ...properties,
+      },
     });
   };
 
-  const trackFormSubmit = (formName: string, properties?: Record<string, any>) => {
+  const trackFormSubmit = (
+    formName: string,
+    properties?: Record<string, any>,
+  ) => {
     trackEvent("form_submitted", {
-      form_name: formName,
-      ...properties,
+      properties: {
+        form_name: formName,
+        ...properties,
+      },
     });
   };
 
   const trackNavigation = (from: string, to: string) => {
     trackEvent("page_navigated", {
-      from,
-      to,
+      properties: {
+        from,
+        to,
+      },
     });
   };
 
-  const trackError = (errorName: string, errorDetails?: Record<string, any>) => {
+  const trackError = (
+    errorName: string,
+    errorDetails?: Record<string, any>,
+  ) => {
     trackEvent("error_occurred", {
-      error_name: errorName,
-      ...errorDetails,
+      properties: {
+        error_name: errorName,
+        ...errorDetails,
+      },
     });
   };
 
-  const trackFeatureUsage = (featureName: string, properties?: Record<string, any>) => {
+  const trackFeatureUsage = (
+    featureName: string,
+    properties?: Record<string, any>,
+  ) => {
     trackEvent("feature_used", {
-      feature_name: featureName,
-      ...properties,
+      properties: {
+        feature_name: featureName,
+        ...properties,
+      },
     });
   };
 
-  const trackConversion = (conversionType: string, value?: number, properties?: Record<string, any>) => {
+  const trackConversion = (
+    conversionType: string,
+    value?: number,
+    properties?: Record<string, any>,
+  ) => {
     trackEvent("conversion", {
-      conversion_type: conversionType,
-      value,
-      ...properties,
+      properties: {
+        conversion_type: conversionType,
+        value,
+        ...properties,
+      },
     });
   };
 
@@ -90,3 +118,4 @@ export const usePostHogTracking = () => {
     trackConversion,
   };
 };
+

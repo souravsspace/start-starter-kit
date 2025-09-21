@@ -1,4 +1,5 @@
 import { createFileRoute, Outlet, redirect } from "@tanstack/react-router";
+import { usePostHogTracking } from "@/hooks/use-posthog-tracking";
 
 export const Route = createFileRoute("/dashboard")({
   beforeLoad: async ({ context }) => {
@@ -14,6 +15,9 @@ export const Route = createFileRoute("/dashboard")({
 });
 
 function RouteComponent() {
+  const { trackPageView } = usePostHogTracking();
+  
+  trackPageView("dashboard_layout_page");
   return (
     <div>
       <Outlet />

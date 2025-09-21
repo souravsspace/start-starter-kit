@@ -1,6 +1,7 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { Button } from "@/components/ui/button";
 import { Cpu, Zap, Mail, SendHorizonal } from "lucide-react";
+import { usePostHogTracking } from "@/hooks/use-posthog-tracking";
 
 // TODO: Add more detailed content about the platform, team, mission, and values.
 
@@ -9,6 +10,9 @@ export const Route = createFileRoute("/_marketing/about")({
 });
 
 function RouteComponent() {
+  const { trackPageView } = usePostHogTracking();
+  
+  trackPageView("about_page");
   return (
     <>
       <section className="py-16 md:py-32">

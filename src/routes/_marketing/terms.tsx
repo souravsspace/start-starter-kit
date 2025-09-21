@@ -1,11 +1,15 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/components/ui/accordion";
+import { usePostHogTracking } from "@/hooks/use-posthog-tracking";
 
 export const Route = createFileRoute("/_marketing/terms")({
   component: RouteComponent,
 });
 
 function RouteComponent() {
+  const { trackPageView } = usePostHogTracking();
+  
+  trackPageView("terms_page");
   const termsSections = [
     {
       id: "acceptance",

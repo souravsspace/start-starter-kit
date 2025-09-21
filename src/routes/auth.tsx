@@ -1,4 +1,5 @@
 import { createFileRoute, Outlet, Link } from "@tanstack/react-router";
+import { usePostHogTracking } from "@/hooks/use-posthog-tracking";
 
 export const Route = createFileRoute("/auth")({
   component: RouteComponent,
@@ -6,6 +7,9 @@ export const Route = createFileRoute("/auth")({
 });
 
 function RouteComponent() {
+  const { trackPageView } = usePostHogTracking();
+  
+  trackPageView("auth_layout_page");
   return (
     <div className="flex flex-col min-h-dvh items-center justify-center">
       <main className="min-w-lg">

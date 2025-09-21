@@ -10,6 +10,10 @@ export const appConfig = {
     general: `hello@${packageJson.domain}`,
     support: `support@${packageJson.domain}`,
   },
+  author: {
+    name: packageJson.author.name,
+    email: packageJson.author.email,
+  },
 };
 
 export const marketingHeaderMenuItems = [

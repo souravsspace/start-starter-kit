@@ -16,11 +16,13 @@ import type * as betterAuth_auth from "../betterAuth/auth.js";
 import type * as emails_components_BaseEmail from "../emails/components/BaseEmail.js";
 import type * as emails_magicLink from "../emails/magicLink.js";
 import type * as emails_resetPassword from "../emails/resetPassword.js";
+import type * as emails_supportRequest from "../emails/supportRequest.js";
 import type * as emails_verifyEmail from "../emails/verifyEmail.js";
 import type * as emails_verifyOTP from "../emails/verifyOTP.js";
 import type * as emails from "../emails.js";
 import type * as http from "../http.js";
 import type * as polar from "../polar.js";
+import type * as support from "../support.js";
 
 import type {
   ApiFromModules,
@@ -45,11 +47,13 @@ declare const fullApi: ApiFromModules<{
   "emails/components/BaseEmail": typeof emails_components_BaseEmail;
   "emails/magicLink": typeof emails_magicLink;
   "emails/resetPassword": typeof emails_resetPassword;
+  "emails/supportRequest": typeof emails_supportRequest;
   "emails/verifyEmail": typeof emails_verifyEmail;
   "emails/verifyOTP": typeof emails_verifyOTP;
   emails: typeof emails;
   http: typeof http;
   polar: typeof polar;
+  support: typeof support;
 }>;
 declare const fullApiWithMounts: typeof fullApi;
 

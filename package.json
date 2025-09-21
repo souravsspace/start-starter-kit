@@ -4,6 +4,10 @@
   "domain": "start.starter.kit",
   "private": true,
   "type": "module",
+  "author": {
+    "name": "Sourav Ukil",
+    "email": "savory@souravsspace.dev"
+  },
   "scripts": {
     "dev": "concurrently -r npm:dev:web npm:dev:convex",
     "dev:web": "vite dev --port 3000",

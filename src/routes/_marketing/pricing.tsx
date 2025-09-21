@@ -20,6 +20,8 @@ function RouteComponent() {
   const { handlePlanChange, isLoading } = useSubscription();
   const [loadingPlan, setLoadingPlan] = useState<string | null>(null);
   const { trackEvent, trackButtonClick, trackPageView } = usePostHogTracking();
+  
+  trackPageView("pricing_page");
 
   /**
    * Handle checkout process for subscription plans

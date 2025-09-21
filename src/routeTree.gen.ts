@@ -11,11 +11,13 @@
 import { createServerRootRoute } from '@tanstack/react-start/server'
 
 import { Route as rootRouteImport } from './routes/__root'
+import { Route as DocsRouteImport } from './routes/docs'
 import { Route as DashboardRouteImport } from './routes/dashboard'
 import { Route as AuthRouteImport } from './routes/auth'
 import { Route as MarketingRouteImport } from './routes/_marketing'
 import { Route as DashboardIndexRouteImport } from './routes/dashboard/index'
 import { Route as MarketingIndexRouteImport } from './routes/_marketing/index'
+import { Route as DocsSplatRouteImport } from './routes/docs/$'
 import { Route as DashboardSettingsRouteImport } from './routes/dashboard/settings'
 import { Route as AuthVerifyEmailRouteImport } from './routes/auth/verify-email'
 import { Route as AuthAuthRouteImport } from './routes/auth/_auth'
@@ -27,10 +29,16 @@ import { Route as MarketingContactRouteImport } from './routes/_marketing/contac
 import { Route as MarketingAboutRouteImport } from './routes/_marketing/about'
 import { Route as AuthAuthRegisterRouteImport } from './routes/auth/_auth/register'
 import { Route as AuthAuthLoginRouteImport } from './routes/auth/_auth/login'
+import { ServerRoute as ApiSearchServerRouteImport } from './routes/api/search'
 import { ServerRoute as ApiAuthSplatServerRouteImport } from './routes/api/auth/$'
 
 const rootServerRouteImport = createServerRootRoute()
 
+const DocsRoute = DocsRouteImport.update({
+  id: '/docs',
+  path: '/docs',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const DashboardRoute = DashboardRouteImport.update({
   id: '/dashboard',
   path: '/dashboard',
@@ -54,6 +62,11 @@ const MarketingIndexRoute = MarketingIndexRouteImport.update({
   id: '/',
   path: '/',
   getParentRoute: () => MarketingRoute,
+} as any)
+const DocsSplatRoute = DocsSplatRouteImport.update({
+  id: '/$',
+  path: '/$',
+  getParentRoute: () => DocsRoute,
 } as any)
 const DashboardSettingsRoute = DashboardSettingsRouteImport.update({
   id: '/settings',
@@ -109,6 +122,11 @@ const AuthAuthLoginRoute = AuthAuthLoginRouteImport.update({
   path: '/login',
   getParentRoute: () => AuthAuthRoute,
 } as any)
+const ApiSearchServerRoute = ApiSearchServerRouteImport.update({
+  id: '/api/search',
+  path: '/api/search',
+  getParentRoute: () => rootServerRouteImport,
+} as any)
 const ApiAuthSplatServerRoute = ApiAuthSplatServerRouteImport.update({
   id: '/api/auth/$',
   path: '/api/auth/$',
@@ -118,6 +136,7 @@ const ApiAuthSplatServerRoute = ApiAuthSplatServerRouteImport.update({
 export interface FileRoutesByFullPath {
   '/auth': typeof AuthAuthRouteWithChildren
   '/dashboard': typeof DashboardRouteWithChildren
+  '/docs': typeof DocsRouteWithChildren
   '/about': typeof MarketingAboutRoute
   '/contact': typeof MarketingContactRoute
   '/help': typeof MarketingHelpRoute
@@ -126,6 +145,7 @@ export interface FileRoutesByFullPath {
   '/terms': typeof MarketingTermsRoute
   '/auth/verify-email': typeof AuthVerifyEmailRoute
   '/dashboard/settings': typeof DashboardSettingsRoute
+  '/docs/$': typeof DocsSplatRoute
   '/': typeof MarketingIndexRoute
   '/dashboard/': typeof DashboardIndexRoute
   '/auth/login': typeof AuthAuthLoginRoute
@@ -133,6 +153,7 @@ export interface FileRoutesByFullPath {
 }
 export interface FileRoutesByTo {
   '/auth': typeof AuthAuthRouteWithChildren
+  '/docs': typeof DocsRouteWithChildren
   '/about': typeof MarketingAboutRoute
   '/contact': typeof MarketingContactRoute
   '/help': typeof MarketingHelpRoute
@@ -141,6 +162,7 @@ export interface FileRoutesByTo {
   '/terms': typeof MarketingTermsRoute
   '/auth/verify-email': typeof AuthVerifyEmailRoute
   '/dashboard/settings': typeof DashboardSettingsRoute
+  '/docs/$': typeof DocsSplatRoute
   '/': typeof MarketingIndexRoute
   '/dashboard': typeof DashboardIndexRoute
   '/auth/login': typeof AuthAuthLoginRoute
@@ -151,6 +173,7 @@ export interface FileRoutesById {
   '/_marketing': typeof MarketingRouteWithChildren
   '/auth': typeof AuthRouteWithChildren
   '/dashboard': typeof DashboardRouteWithChildren
+  '/docs': typeof DocsRouteWithChildren
   '/_marketing/about': typeof MarketingAboutRoute
   '/_marketing/contact': typeof MarketingContactRoute
   '/_marketing/help': typeof MarketingHelpRoute
@@ -160,6 +183,7 @@ export interface FileRoutesById {
   '/auth/_auth': typeof AuthAuthRouteWithChildren
   '/auth/verify-email': typeof AuthVerifyEmailRoute
   '/dashboard/settings': typeof DashboardSettingsRoute
+  '/docs/$': typeof DocsSplatRoute
   '/_marketing/': typeof MarketingIndexRoute
   '/dashboard/': typeof DashboardIndexRoute
   '/auth/_auth/login': typeof AuthAuthLoginRoute
@@ -170,6 +194,7 @@ export interface FileRouteTypes {
   fullPaths:
     | '/auth'
     | '/dashboard'
+    | '/docs'
     | '/about'
     | '/contact'
     | '/help'
@@ -178,6 +203,7 @@ export interface FileRouteTypes {
     | '/terms'
     | '/auth/verify-email'
     | '/dashboard/settings'
+    | '/docs/$'
     | '/'
     | '/dashboard/'
     | '/auth/login'
@@ -185,6 +211,7 @@ export interface FileRouteTypes {
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/auth'
+    | '/docs'
     | '/about'
     | '/contact'
     | '/help'
@@ -193,6 +220,7 @@ export interface FileRouteTypes {
     | '/terms'
     | '/auth/verify-email'
     | '/dashboard/settings'
+    | '/docs/$'
     | '/'
     | '/dashboard'
     | '/auth/login'
@@ -202,6 +230,7 @@ export interface FileRouteTypes {
     | '/_marketing'
     | '/auth'
     | '/dashboard'
+    | '/docs'
     | '/_marketing/about'
     | '/_marketing/contact'
     | '/_marketing/help'
@@ -211,6 +240,7 @@ export interface FileRouteTypes {
     | '/auth/_auth'
     | '/auth/verify-email'
     | '/dashboard/settings'
+    | '/docs/$'
     | '/_marketing/'
     | '/dashboard/'
     | '/auth/_auth/login'
@@ -221,31 +251,43 @@ export interface RootRouteChildren {
   MarketingRoute: typeof MarketingRouteWithChildren
   AuthRoute: typeof AuthRouteWithChildren
   DashboardRoute: typeof DashboardRouteWithChildren
+  DocsRoute: typeof DocsRouteWithChildren
 }
 export interface FileServerRoutesByFullPath {
+  '/api/search': typeof ApiSearchServerRoute
   '/api/auth/$': typeof ApiAuthSplatServerRoute
 }
 export interface FileServerRoutesByTo {
+  '/api/search': typeof ApiSearchServerRoute
   '/api/auth/$': typeof ApiAuthSplatServerRoute
 }
 export interface FileServerRoutesById {
   __root__: typeof rootServerRouteImport
+  '/api/search': typeof ApiSearchServerRoute
   '/api/auth/$': typeof ApiAuthSplatServerRoute
 }
 export interface FileServerRouteTypes {
   fileServerRoutesByFullPath: FileServerRoutesByFullPath
-  fullPaths: '/api/auth/$'
+  fullPaths: '/api/search' | '/api/auth/$'
   fileServerRoutesByTo: FileServerRoutesByTo
-  to: '/api/auth/$'
-  id: '__root__' | '/api/auth/$'
+  to: '/api/search' | '/api/auth/$'
+  id: '__root__' | '/api/search' | '/api/auth/$'
   fileServerRoutesById: FileServerRoutesById
 }
 export interface RootServerRouteChildren {
+  ApiSearchServerRoute: typeof ApiSearchServerRoute
   ApiAuthSplatServerRoute: typeof ApiAuthSplatServerRoute
 }
 
 declare module '@tanstack/react-router' {
   interface FileRoutesByPath {
+    '/docs': {
+      id: '/docs'
+      path: '/docs'
+      fullPath: '/docs'
+      preLoaderRoute: typeof DocsRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/dashboard': {
       id: '/dashboard'
       path: '/dashboard'
@@ -280,6 +322,13 @@ declare module '@tanstack/react-router' {
       fullPath: '/'
       preLoaderRoute: typeof MarketingIndexRouteImport
       parentRoute: typeof MarketingRoute
+    }
+    '/docs/$': {
+      id: '/docs/$'
+      path: '/$'
+      fullPath: '/docs/$'
+      preLoaderRoute: typeof DocsSplatRouteImport
+      parentRoute: typeof DocsRoute
     }
     '/dashboard/settings': {
       id: '/dashboard/settings'
@@ -362,6 +411,13 @@ declare module '@tanstack/react-router' {
 }
 declare module '@tanstack/react-start/server' {
   interface ServerFileRoutesByPath {
+    '/api/search': {
+      id: '/api/search'
+      path: '/api/search'
+      fullPath: '/api/search'
+      preLoaderRoute: typeof ApiSearchServerRouteImport
+      parentRoute: typeof rootServerRouteImport
+    }
     '/api/auth/$': {
       id: '/api/auth/$'
       path: '/api/auth/$'
@@ -436,15 +492,27 @@ const DashboardRouteWithChildren = DashboardRoute._addFileChildren(
   DashboardRouteChildren,
 )
 
+interface DocsRouteChildren {
+  DocsSplatRoute: typeof DocsSplatRoute
+}
+
+const DocsRouteChildren: DocsRouteChildren = {
+  DocsSplatRoute: DocsSplatRoute,
+}
+
+const DocsRouteWithChildren = DocsRoute._addFileChildren(DocsRouteChildren)
+
 const rootRouteChildren: RootRouteChildren = {
   MarketingRoute: MarketingRouteWithChildren,
   AuthRoute: AuthRouteWithChildren,
   DashboardRoute: DashboardRouteWithChildren,
+  DocsRoute: DocsRouteWithChildren,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
   ._addFileTypes<FileRouteTypes>()
 const rootServerRouteChildren: RootServerRouteChildren = {
+  ApiSearchServerRoute: ApiSearchServerRoute,
   ApiAuthSplatServerRoute: ApiAuthSplatServerRoute,
 }
 export const serverRouteTree = rootServerRouteImport

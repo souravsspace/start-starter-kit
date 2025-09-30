@@ -69,9 +69,9 @@ export function SubscriptionManager() {
 		// Map Convex plan to our tiers
 		let tierId: string;
 		if (currentPlan === "PREMIUM_MONTHLY") {
-			tierId = "premiumMonthly";
+			tierId = "PREMIUM_MONTHLY";
 		} else if (currentPlan === "PREMIUM_YEARLY") {
-			tierId = "premiumYearly";
+			tierId = "PREMIUM_YEARLY";
 		} else {
 			return null;
 		}
@@ -101,7 +101,13 @@ export function SubscriptionManager() {
 					? new Date(subscriptionStatus.currentPeriodStart).toISOString()
 					: null,
 				cancel_at_period_end: subscriptionStatus?.cancelAtPeriodEnd || false,
-				price: subscriptionStatus?.amount,
+				price: subscriptionStatus?.amount
+					? {
+							amount: subscriptionStatus.amount,
+							currency: subscriptionStatus.currency || "usd",
+							interval: subscriptionStatus.recurringInterval || "month",
+						}
+					: undefined,
 			},
 		};
 	};
@@ -247,7 +253,24 @@ export function SubscriptionManager() {
 		interval: string;
 	}) => {
 		if (!price) return "";
-		return `${price.amount / 100}/${price.interval}`;
+		const interval = price.interval === "month" ? "mo" : "yr";
+		return `$${price.amount / 100}/${interval}`;
+	};
+
+	const formatPriceFromSubscription = (
+		subscriptionStatus:
+			| {
+					amount?: number | null;
+					currency?: string;
+					recurringInterval?: "month" | "year";
+			  }
+			| null
+			| undefined,
+	) => {
+		if (!subscriptionStatus || !subscriptionStatus.amount) return "";
+		const interval =
+			subscriptionStatus.recurringInterval === "year" ? "yr" : "mo";
+		return `$${subscriptionStatus.amount / 100}/${interval}`;
 	};
 
 	return (
@@ -288,6 +311,7 @@ export function SubscriptionManager() {
 									<p className="text-sm font-medium text-primary/70">Price</p>
 									<p className="text-lg font-semibold text-primary">
 										{formatPrice(currentSub.subscription.price) ||
+											formatPriceFromSubscription(subscriptionStatus) ||
 											`${currentSub.tier?.priceMonthly}`}
 									</p>
 								</div>
@@ -357,6 +381,7 @@ export function SubscriptionManager() {
 												{formatDate(currentSub.subscription.current_period_end)}{" "}
 												for{" "}
 												{formatPrice(currentSub.subscription.price) ||
+													formatPriceFromSubscription(subscriptionStatus) ||
 													`${currentSub.tier?.priceMonthly}`}
 												. Your payment method will be charged on this date.
 											</AlertDescription>

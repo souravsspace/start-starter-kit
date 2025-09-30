@@ -45,7 +45,7 @@ function RouteComponent() {
   const { trackFormSubmit, trackButtonClick, trackPageView } =
     usePostHogTracking();
   
-  trackPageView("contact_page");
+  trackPageView({ page: "contact_page" });
   const submitSupportRequest = useMutation(api.support.submitSupportRequest);
 
   const form = useForm<TContactSchema>({

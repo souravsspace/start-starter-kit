@@ -1,69 +1,50 @@
-Welcome to your new TanStack app! 
+# Start Starter Kit
 
-# Getting Started
+A modern SaaS starter kit built with React, Convex, and TanStack Start.
 
-To run this application:
+## Features
 
-```bash
-pnpm install
-pnpm start
-```
+- 🚀 **Modern Stack**: React 19, TanStack Start (SSR), Tailwind CSS v4, TypeScript
+- 🔐 **Authentication**: Better Auth with OAuth providers (Google, GitHub)
+- 💳 **Payments**: Polar integration for subscription management
+- 📧 **Email**: Resend for transactional emails
+- 📊 **Analytics**: PostHog integration
+- 🎨 **UI Components**: Radix UI + shadcn/ui + Magic UI
+- 🌙 **Theme System**: Dark/light mode support
+- 🔧 **Developer Experience**: Vite, Biome, Vitest, TypeScript strict mode
 
-# Building For Production
-
-To build this application for production:
-
-```bash
-pnpm build
-```
-
-## Testing
-
-This project uses [Vitest](https://vitest.dev/) for testing. You can run the tests with:
-
-```bash
-pnpm test
-```
-
-## Styling
-
-This project uses [Tailwind CSS](https://tailwindcss.com/) for styling.
-
-
-## Linting & Formatting
-
-This project uses [Biome](https://biomejs.dev/) for linting and formatting. The following scripts are available:
-
-
-```bash
-pnpm lint
-pnpm format
-pnpm check
-```
-
-
-## Setting up Convex
+## Quick Start
 
 ### Prerequisites
-- A Convex account ([dashboard.convex.dev](https://dashboard.convex.dev))
-- Node.js and pnpm installed
 
-### Initial Setup
+- Node.js 18+ 
+- pnpm (recommended) or npm/yarn
 
-1. **Initialize Convex**:
+### Installation
+
+1. Clone the repository:
 ```bash
-npx convex init
+git clone <repository-url>
+cd start-starter-kit
 ```
 
-2. **Set Environment Variables**:
-
-#### Local Environment Variables (in `.env.local`):
+2. Install dependencies:
 ```bash
+pnpm install
+```
+
+3. Set up environment variables:
+
+#### Frontend Environment (.env.local)
+
+Create a `.env.local` file in the root directory:
+
+```env
 # Convex configuration, get this URL from your [Dashboard](dashboard.convex.dev)
 CONVEX_DEPLOYMENT=start-starter-kit
 
 # Better-auth
-BETTER_AUTH_SECRET=secret
+BETTER_AUTH_SECRET=your-secret-key-here
 GOOGLE_CLIENT_ID=your-google-client-id
 GOOGLE_CLIENT_SECRET=your-google-client-secret
 GITHUB_CLIENT_ID=your-github-client-id
@@ -71,382 +52,158 @@ GITHUB_CLIENT_SECRET=your-github-client-secret
 
 # Application URLs
 SITE_URL=http://localhost:3000
-VITE_SITE_URL=http://localhost:3000
 VITE_CONVEX_URL=https://your-deployment-name.convex.cloud
 VITE_CONVEX_SITE_URL=https://your-deployment-name.convex.site
+
+# Posthog
+VITE_PUBLIC_POSTHOG_KEY=your-posthog-key
+VITE_PUBLIC_POSTHOG_HOST=https://us.i.posthog.com
+
+# Polar Pricing
+VITE_PREMIUM_MONTHLY_PRICE_ID=your-monthly-price-id
+VITE_PREMIUM_MONTHLY_PRICE=12.00
+VITE_PREMIUM_YEARLY_PRICE_ID=your-yearly-price-id
+VITE_PREMIUM_YEARLY_PRICE=120.00
 ```
 
-#### Server-side Environment Variables (using Convex CLI):
+#### Convex Environment Setup
+
+After setting up your `.env.local` file, configure the Convex backend environment:
+
 ```bash
-# Authentication
-npx convex env set BETTER_AUTH_SECRET your_auth_secret_here
-npx convex env set GITHUB_CLIENT_ID your_github_client_id
-npx convex env set GITHUB_CLIENT_SECRET your_github_client_secret
-npx convex env set GOOGLE_CLIENT_ID your_google_client_id
-npx convex env set GOOGLE_CLIENT_SECRET your_google_client_secret
+# Initialize Convex and get your deployment URL
+npx convex dev --once --configure=new
 
-# Email (Resend)
-npx convex env set RESEND_API_KEY your_resend_api_key
-
-# Payment Processing (Polar)
-npx convex env set POLAR_ORGANIZATION_TOKEN your_polar_org_token
-npx convex env set POLAR_WEBHOOK_SECRET your_polar_webhook_secret
-npx convex env set POLAR_SERVER sandbox  # or "production"
-
-# Application URLs
+# Set required Convex environment variables
+npx convex env set BETTER_AUTH_SECRET your-secret-key-here
+npx convex env set GITHUB_CLIENT_ID your-github-client-id
+npx convex env set GITHUB_CLIENT_SECRET your-github-client-secret
+npx convex env set GOOGLE_CLIENT_ID your-google-client-id
+npx convex env set GOOGLE_CLIENT_SECRET your-google-client-secret
+npx convex env set RESEND_API_KEY your-resend-api-key
 npx convex env set SITE_URL http://localhost:3000
-npx convex env set VITE_CONVEX_SITE_URL https://your-deployment-name.convex.cloud
+npx convex env set VITE_CONVEX_SITE_URL https://your-deployment-name.convex.site
+npx convex env set POLAR_ORGANIZATION_TOKEN your-polar-org-token
+npx convex env set POLAR_WEBHOOK_SECRET your-polar-webhook-secret
+npx convex env set POLAR_SERVER sandbox
+
+# Sync Polar products
+npx convex run polar:syncProducts
 ```
 
-### Getting Required Values
+### Required Service Setup
 
-**GitHub OAuth**:
-1. Go to [GitHub Developer Settings](https://github.com/settings/developers)
-2. Create a new OAuth App
-3. Set Authorization callback URL: `http://localhost:3000/api/auth/callback/github`
-4. Copy Client ID and generate Client Secret
+#### 1. Convex Backend
+- Sign up at [convex.dev](https://convex.dev)
+- Create a new project
+- Copy your deployment URL to `VITE_CONVEX_URL` and `VITE_CONVEX_SITE_URL`
 
-**Google OAuth**:
-1. Go to [Google Cloud Console](https://console.cloud.google.com/)
-2. Create a new project or select existing one
-3. Enable Google+ API
-4. Create OAuth 2.0 credentials
-5. Set authorized redirect URI: `http://localhost:3000/api/auth/callback/google`
-6. Copy Client ID and Client Secret
+#### 2. OAuth Providers
+- **Google**: Create credentials at [Google Cloud Console](https://console.cloud.google.com/apis/credentials)
+- **GitHub**: Create OAuth app at [GitHub Developer Settings](https://github.com/settings/applications/new)
+- Add redirect URLs: `http://localhost:3000/api/auth/callback/google` and `http://localhost:3000/api/auth/callback/github`
 
-**Polar Integration**:
-1. Create an account at [Polar.sh](https://polar.sh/)
-2. Create your products/subscriptions
-3. Get your Organization Token from Polar settings
-4. Generate a Webhook Secret for webhook handling
+#### 3. Email Service (Resend)
+- Sign up at [resend.com](https://resend.com)
+- Get your API key and set `RESEND_API_KEY` in Convex environment
 
-**Resend (Email)**:
-1. Create an account at [Resend](https://resend.com/)
-2. Get your API key from the dashboard
+#### 4. Payment Processor (Polar)
+- Sign up at [polar.sh](https://polar.sh)
+- Create an organization and products
+- Set up webhooks and get your organization token
+- Configure price IDs in your environment variables
 
-### Development Workflow
+#### 5. Analytics (PostHog)
+- Sign up at [posthog.com](https://posthog.com)
+- Create a project and get your API key
+- Set `VITE_PUBLIC_POSTHOG_KEY` in your environment
 
-1. **Start development server**:
-```bash
-npx convex dev
-```
+### Running the Application
 
-2. **Run your application**:
+Start the development server:
+
 ```bash
 pnpm dev
 ```
 
-### Environment Management
+This will start both the frontend (port 3000) and Convex backend concurrently.
 
-**List all environment variables**:
-```bash
-npx convex env list
+## Available Scripts
+
+- `pnpm dev` - Start development server with Convex backend
+- `pnpm dev:web` - Start frontend only (port 3000)
+- `pnpm dev:convex` - Start Convex backend only
+- `pnpm build` - Build for production
+- `pnpm test` - Run tests
+- `pnpm lint` - Lint code
+- `pnpm check` - Run all code quality checks
+- `pnpm format` - Format code
+
+## Project Structure
+
+```
+├── convex/                 # Backend functions and configuration
+│   ├── betterAuth/        # Authentication configuration
+│   ├── emails/           # Email templates
+│   ├── constants/        # App constants (plans, etc.)
+│   └── *.ts             # Convex functions (schema, auth, etc.)
+├── src/
+│   ├── components/       # React components
+│   │   ├── marketing/   # Landing page components
+│   │   ├── subscription/ # Payment components
+│   │   ├── ui/          # Reusable UI components
+│   │   └── ...
+│   ├── hooks/          # Custom React hooks
+│   ├── routes/         # File-based routing
+│   ├── integrations/   # Third-party integrations
+│   └── ...
+└── public/             # Static assets
 ```
 
-**Remove an environment variable**:
-```bash
-npx convex env remove VARIABLE_NAME
-```
+## Authentication Flow
 
-**Pull environment variables to local file**:
-```bash
-npx convex env pull .env.local
-```
+The application uses Better Auth with the following flow:
+1. Users can sign up/login with Google or GitHub OAuth
+2. Email verification is required
+3. Users are redirected to dashboard after successful authentication
+4. Session management is handled automatically
+
+## Subscription System
+
+- Integrated with Polar for payment processing
+- Supports monthly and yearly billing cycles
+- User tier management with automatic upgrades/downgrades
+- Webhook handling for payment events
+
+## Deployment
 
 ### Production Deployment
 
-1. **Update production environment variables**:
+1. Build the application:
 ```bash
-npx convex env set --prod VARIABLE_NAME value
+pnpm build
 ```
 
-2. **Deploy to production**:
+2. Deploy the frontend to your preferred hosting platform (Vercel, Netlify, etc.)
+
+3. Update environment variables for production:
+   - Set `SITE_URL` to your production domain
+   - Update OAuth redirect URLs
+   - Configure Polar webhooks for production
+
+4. Run the Convex sync in production:
 ```bash
 npx convex deploy
 ```
 
+## Contributing
 
-## Shadcn
+1. Fork the repository
+2. Create a feature branch
+3. Make your changes
+4. Run tests and linting: `pnpm check`
+5. Submit a pull request
 
-Add components using the latest version of [Shadcn](https://ui.shadcn.com/).
+## License
 
-```bash
-pnpx shadcn@latest add button
-```
-
-
-## T3Env
-
-- You can use T3Env to add type safety to your environment variables.
-- Add Environment variables to the `src/env.mjs` file.
-- Use the environment variables in your code.
-
-### Usage
-
-```ts
-import { env } from "@/env";
-
-console.log(env.VITE_APP_TITLE);
-```
-
-
-
-
-
-
-## Routing
-This project uses [TanStack Router](https://tanstack.com/router). The initial setup is a file based router. Which means that the routes are managed as files in `src/routes`.
-
-### Adding A Route
-
-To add a new route to your application just add another a new file in the `./src/routes` directory.
-
-TanStack will automatically generate the content of the route file for you.
-
-Now that you have two routes you can use a `Link` component to navigate between them.
-
-### Adding Links
-
-To use SPA (Single Page Application) navigation you will need to import the `Link` component from `@tanstack/react-router`.
-
-```tsx
-import { Link } from "@tanstack/react-router";
-```
-
-Then anywhere in your JSX you can use it like so:
-
-```tsx
-<Link to="/about">About</Link>
-```
-
-This will create a link that will navigate to the `/about` route.
-
-More information on the `Link` component can be found in the [Link documentation](https://tanstack.com/router/v1/docs/framework/react/api/router/linkComponent).
-
-### Using A Layout
-
-In the File Based Routing setup the layout is located in `src/routes/__root.tsx`. Anything you add to the root route will appear in all the routes. The route content will appear in the JSX where you use the `<Outlet />` component.
-
-Here is an example layout that includes a header:
-
-```tsx
-import { Outlet, createRootRoute } from '@tanstack/react-router'
-import { TanStackRouterDevtools } from '@tanstack/react-router-devtools'
-
-import { Link } from "@tanstack/react-router";
-
-export const Route = createRootRoute({
-  component: () => (
-    <>
-      <header>
-        <nav>
-          <Link to="/">Home</Link>
-          <Link to="/about">About</Link>
-        </nav>
-      </header>
-      <Outlet />
-      <TanStackRouterDevtools />
-    </>
-  ),
-})
-```
-
-The `<TanStackRouterDevtools />` component is not required so you can remove it if you don't want it in your layout.
-
-More information on layouts can be found in the [Layouts documentation](https://tanstack.com/router/latest/docs/framework/react/guide/routing-concepts#layouts).
-
-
-## Data Fetching
-
-There are multiple ways to fetch data in your application. You can use TanStack Query to fetch data from a server. But you can also use the `loader` functionality built into TanStack Router to load the data for a route before it's rendered.
-
-For example:
-
-```tsx
-const peopleRoute = createRoute({
-  getParentRoute: () => rootRoute,
-  path: "/people",
-  loader: async () => {
-    const response = await fetch("https://swapi.dev/api/people");
-    return response.json() as Promise<{
-      results: {
-        name: string;
-      }[];
-    }>;
-  },
-  component: () => {
-    const data = peopleRoute.useLoaderData();
-    return (
-      <ul>
-        {data.results.map((person) => (
-          <li key={person.name}>{person.name}</li>
-        ))}
-      </ul>
-    );
-  },
-});
-```
-
-Loaders simplify your data fetching logic dramatically. Check out more information in the [Loader documentation](https://tanstack.com/router/latest/docs/framework/react/guide/data-loading#loader-parameters).
-
-### React-Query
-
-React-Query is an excellent addition or alternative to route loading and integrating it into you application is a breeze.
-
-First add your dependencies:
-
-```bash
-pnpm add @tanstack/react-query @tanstack/react-query-devtools
-```
-
-Next we'll need to create a query client and provider. We recommend putting those in `main.tsx`.
-
-```tsx
-import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
-
-// ...
-
-const queryClient = new QueryClient();
-
-// ...
-
-if (!rootElement.innerHTML) {
-  const root = ReactDOM.createRoot(rootElement);
-
-  root.render(
-    <QueryClientProvider client={queryClient}>
-      <RouterProvider router={router} />
-    </QueryClientProvider>
-  );
-}
-```
-
-You can also add TanStack Query Devtools to the root route (optional).
-
-```tsx
-import { ReactQueryDevtools } from "@tanstack/react-query-devtools";
-
-const rootRoute = createRootRoute({
-  component: () => (
-    <>
-      <Outlet />
-      <ReactQueryDevtools buttonPosition="top-right" />
-      <TanStackRouterDevtools />
-    </>
-  ),
-});
-```
-
-Now you can use `useQuery` to fetch your data.
-
-```tsx
-import { useQuery } from "@tanstack/react-query";
-
-import "./App.css";
-
-function App() {
-  const { data } = useQuery({
-    queryKey: ["people"],
-    queryFn: () =>
-      fetch("https://swapi.dev/api/people")
-        .then((res) => res.json())
-        .then((data) => data.results as { name: string }[]),
-    initialData: [],
-  });
-
-  return (
-    <div>
-      <ul>
-        {data.map((person) => (
-          <li key={person.name}>{person.name}</li>
-        ))}
-      </ul>
-    </div>
-  );
-}
-
-export default App;
-```
-
-You can find out everything you need to know on how to use React-Query in the [React-Query documentation](https://tanstack.com/query/latest/docs/framework/react/overview).
-
-## State Management
-
-Another common requirement for React applications is state management. There are many options for state management in React. TanStack Store provides a great starting point for your project.
-
-First you need to add TanStack Store as a dependency:
-
-```bash
-pnpm add @tanstack/store
-```
-
-Now let's create a simple counter in the `src/App.tsx` file as a demonstration.
-
-```tsx
-import { useStore } from "@tanstack/react-store";
-import { Store } from "@tanstack/store";
-import "./App.css";
-
-const countStore = new Store(0);
-
-function App() {
-  const count = useStore(countStore);
-  return (
-    <div>
-      <button onClick={() => countStore.setState((n) => n + 1)}>
-        Increment - {count}
-      </button>
-    </div>
-  );
-}
-
-export default App;
-```
-
-One of the many nice features of TanStack Store is the ability to derive state from other state. That derived state will update when the base state updates.
-
-Let's check this out by doubling the count using derived state.
-
-```tsx
-import { useStore } from "@tanstack/react-store";
-import { Store, Derived } from "@tanstack/store";
-import "./App.css";
-
-const countStore = new Store(0);
-
-const doubledStore = new Derived({
-  fn: () => countStore.state * 2,
-  deps: [countStore],
-});
-doubledStore.mount();
-
-function App() {
-  const count = useStore(countStore);
-  const doubledCount = useStore(doubledStore);
-
-  return (
-    <div>
-      <button onClick={() => countStore.setState((n) => n + 1)}>
-        Increment - {count}
-      </button>
-      <div>Doubled - {doubledCount}</div>
-    </div>
-  );
-}
-
-export default App;
-```
-
-We use the `Derived` class to create a new store that is derived from another store. The `Derived` class has a `mount` method that will start the derived store updating.
-
-Once we've created the derived store we can use it in the `App` component just like we would any other store using the `useStore` hook.
-
-You can find out everything you need to know on how to use TanStack Store in the [TanStack Store documentation](https://tanstack.com/store/latest).
-
-# Demo files
-
-Files prefixed with `demo` can be safely deleted. They are there to provide a starting point for you to play around with the features you've installed.
-
-# Learn More
-
-You can learn more about all of the offerings from TanStack in the [TanStack documentation](https://tanstack.com).
+MIT License - see LICENSE file for details.

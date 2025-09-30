@@ -9,7 +9,7 @@ export const Route = createFileRoute("/_marketing/privacy")({
 function RouteComponent() {
   const { trackPageView } = usePostHogTracking();
   
-  trackPageView("privacy_page");
+  trackPageView({ page: "privacy_page" });
   const privacySections = [
     {
       id: "information-collection",

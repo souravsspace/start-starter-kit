@@ -9,7 +9,7 @@ export const Route = createFileRoute("/dashboard/settings")({
 function RouteComponent() {
   const { trackPageView } = usePostHogTracking();
   
-  trackPageView("dashboard_settings_page");
+  trackPageView({ page: "dashboard_settings_page" });
   return (
     <div className="container mx-auto py-8">
       <div className="mb-8">

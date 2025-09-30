@@ -9,7 +9,7 @@ export const Route = createFileRoute("/_marketing/terms")({
 function RouteComponent() {
   const { trackPageView } = usePostHogTracking();
   
-  trackPageView("terms_page");
+  trackPageView({ page: "terms_page" });
   const termsSections = [
     {
       id: "acceptance",

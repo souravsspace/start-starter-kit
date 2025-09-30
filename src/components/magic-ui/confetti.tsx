@@ -1,32 +1,32 @@
 import type {
-  GlobalOptions as ConfettiGlobalOptions,
-  CreateTypes as ConfettiInstance,
-  Options as ConfettiOptions,
+	GlobalOptions as ConfettiGlobalOptions,
+	CreateTypes as ConfettiInstance,
+	Options as ConfettiOptions,
 } from "canvas-confetti";
 import confetti from "canvas-confetti";
 import type { ReactNode } from "react";
 import React, {
-  createContext,
-  forwardRef,
-  useCallback,
-  useEffect,
-  useImperativeHandle,
-  useMemo,
-  useRef,
+	createContext,
+	forwardRef,
+	useCallback,
+	useEffect,
+	useImperativeHandle,
+	useMemo,
+	useRef,
 } from "react";
 
 import { Button } from "@/components/ui/button";
 import { usePostHogTracking } from "@/hooks/use-posthog-tracking";
 
 type Api = {
-  fire: (options?: ConfettiOptions) => void;
+	fire: (options?: ConfettiOptions) => void;
 };
 
 type Props = React.ComponentPropsWithRef<"canvas"> & {
-  options?: ConfettiOptions;
-  globalOptions?: ConfettiGlobalOptions;
-  manualstart?: boolean;
-  children?: ReactNode;
+	options?: ConfettiOptions;
+	globalOptions?: ConfettiGlobalOptions;
+	manualstart?: boolean;
+	children?: ReactNode;
 };
 
 export type ConfettiRef = Api | null;
@@ -35,71 +35,71 @@ const ConfettiContext = createContext<Api>({} as Api);
 
 // Define component first
 const ConfettiComponent = forwardRef<ConfettiRef, Props>((props, ref) => {
-  const {
-    options,
-    globalOptions = { resize: true, useWorker: true },
-    manualstart = false,
-    children,
-    ...rest
-  } = props;
-  const instanceRef = useRef<ConfettiInstance | null>(null);
+	const {
+		options,
+		globalOptions = { resize: true, useWorker: true },
+		manualstart = false,
+		children,
+		...rest
+	} = props;
+	const instanceRef = useRef<ConfettiInstance | null>(null);
 
-  const canvasRef = useCallback(
-    (node: HTMLCanvasElement) => {
-      if (node !== null) {
-        if (instanceRef.current) return;
-        instanceRef.current = confetti.create(node, {
-          ...globalOptions,
-          resize: true,
-        });
-      } else {
-        if (instanceRef.current) {
-          instanceRef.current.reset();
-          instanceRef.current = null;
-        }
-      }
-    },
-    [globalOptions],
-  );
+	const canvasRef = useCallback(
+		(node: HTMLCanvasElement) => {
+			if (node !== null) {
+				if (instanceRef.current) return;
+				instanceRef.current = confetti.create(node, {
+					...globalOptions,
+					resize: true,
+				});
+			} else {
+				if (instanceRef.current) {
+					instanceRef.current.reset();
+					instanceRef.current = null;
+				}
+			}
+		},
+		[globalOptions],
+	);
 
-  const fire = useCallback(
-    async (opts = {}) => {
-      try {
-        await instanceRef.current?.({ ...options, ...opts });
-      } catch (error) {
-        console.error("Confetti error:", error);
-      }
-    },
-    [options],
-  );
+	const fire = useCallback(
+		async (opts = {}) => {
+			try {
+				await instanceRef.current?.({ ...options, ...opts });
+			} catch (error) {
+				console.error("Confetti error:", error);
+			}
+		},
+		[options],
+	);
 
-  const api = useMemo(
-    () => ({
-      fire,
-    }),
-    [fire],
-  );
+	const api = useMemo(
+		() => ({
+			fire,
+		}),
+		[fire],
+	);
 
-  useImperativeHandle(ref, () => api, [api]);
+	useImperativeHandle(ref, () => api, [api]);
 
-  useEffect(() => {
-    if (!manualstart) {
-      (async () => {
-        try {
-          await fire();
-        } catch (error) {
-          console.error("Confetti effect error:", error);
-        }
-      })();
-    }
-  }, [manualstart, fire]);
+	useEffect(() => {
+		if (!manualstart) {
+			(async () => {
+				try {
+					await fire();
+				} catch (error) {
+					console.error("Confetti effect error:", error);
+				}
+			})();
+		}
+	}, [manualstart, fire]);
 
-  return (
-    <ConfettiContext.Provider value={api}>
-      <canvas ref={canvasRef} {...rest} />
-      {children}
-    </ConfettiContext.Provider>
-  );
+	return (
+		<ConfettiContext.Provider value={api}>
+			<canvas ref={canvasRef} {...rest} />
+			{children}
+		</ConfettiContext.Provider>
+	);
 });
 
 // Set display name immediately
@@ -109,40 +109,40 @@ ConfettiComponent.displayName = "Confetti";
 export const Confetti = ConfettiComponent;
 
 interface ConfettiButtonProps extends React.ComponentProps<"button"> {
-  options?: ConfettiOptions &
-    ConfettiGlobalOptions & { canvas?: HTMLCanvasElement };
+	options?: ConfettiOptions &
+		ConfettiGlobalOptions & { canvas?: HTMLCanvasElement };
 }
 
 const ConfettiButtonComponent = ({
-  options,
-  children,
-  ...props
+	options,
+	children,
+	...props
 }: ConfettiButtonProps) => {
-  const { trackButtonClick } = usePostHogTracking();
-  
-  const handleClick = async (event: React.MouseEvent<HTMLButtonElement>) => {
-    trackButtonClick("confetti_button", { button_text: children?.toString() });
-    try {
-      const rect = event.currentTarget.getBoundingClientRect();
-      const x = rect.left + rect.width / 2;
-      const y = rect.top + rect.height / 2;
-      await confetti({
-        ...options,
-        origin: {
-          x: x / window.innerWidth,
-          y: y / window.innerHeight,
-        },
-      });
-    } catch (error) {
-      console.error("Confetti button error:", error);
-    }
-  };
+	const { trackButtonClick } = usePostHogTracking();
 
-  return (
-    <Button onClick={handleClick} {...props}>
-      {children}
-    </Button>
-  );
+	const handleClick = async (event: React.MouseEvent<HTMLButtonElement>) => {
+		trackButtonClick("confetti_button", { button_text: children?.toString() });
+		try {
+			const rect = event.currentTarget.getBoundingClientRect();
+			const x = rect.left + rect.width / 2;
+			const y = rect.top + rect.height / 2;
+			await confetti({
+				...options,
+				origin: {
+					x: x / window.innerWidth,
+					y: y / window.innerHeight,
+				},
+			});
+		} catch (error) {
+			console.error("Confetti button error:", error);
+		}
+	};
+
+	return (
+		<Button onClick={handleClick} {...props}>
+			{children}
+		</Button>
+	);
 };
 
 ConfettiButtonComponent.displayName = "ConfettiButton";

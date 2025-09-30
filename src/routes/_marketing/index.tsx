@@ -10,7 +10,7 @@ export const Route = createFileRoute("/_marketing/")({
 function App() {
   const { trackPageView } = usePostHogTracking();
   
-  trackPageView("home_page");
+  trackPageView({ page: "home_page" });
   return (
     <>
       <HeroSection />

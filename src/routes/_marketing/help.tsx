@@ -55,7 +55,7 @@ function RouteComponent() {
   const { trackButtonClick, trackFormSubmit, trackPageView } =
     usePostHogTracking();
   
-  trackPageView("help_page");
+  trackPageView({ page: "help_page" });
   const submitSupportRequest = useMutation(api.support.submitSupportRequest);
 
   const form = useForm<THelpSchema>({

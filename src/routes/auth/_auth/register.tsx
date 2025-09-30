@@ -37,7 +37,7 @@ function RouteComponent() {
 	const [isSubmitting, setIsSubmitting] = useState(false);
 	const { trackEvent, trackFormSubmit, trackButtonClick, trackError, trackPageView } = usePostHogTracking();
 	
-	trackPageView("register_page");
+	trackPageView({ page: "register_page" });
 
 	const form = useForm<TRegisterSchema>({
 		resolver: zodResolver(registerSchema),

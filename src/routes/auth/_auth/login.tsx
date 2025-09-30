@@ -10,8 +10,8 @@ import {
 	FormMessage,
 } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
-import { signIn } from "@/integrations/better-auth/client";
 import { usePostHogTracking } from "@/hooks/use-posthog-tracking";
+import { signIn } from "@/integrations/better-auth/client";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { Link, createFileRoute } from "@tanstack/react-router";
 import { useState } from "react";
@@ -33,9 +33,15 @@ type TLoginSchema = z.infer<typeof loginSchema>;
 function RouteComponent() {
 	const navigate = Route.useNavigate();
 	const [isSubmitting, setIsSubmitting] = useState(false);
-	const { trackEvent, trackFormSubmit, trackButtonClick, trackError, trackPageView } = usePostHogTracking();
-	
-	trackPageView("login_page");
+	const {
+		trackEvent,
+		trackFormSubmit,
+		trackButtonClick,
+		trackError,
+		trackPageView,
+	} = usePostHogTracking();
+
+	trackPageView({ page: "login_page" });
 
 	const form = useForm<TLoginSchema>({
 		resolver: zodResolver(loginSchema),
@@ -43,7 +49,7 @@ function RouteComponent() {
 			email: "",
 			password: "",
 		},
-	})
+	});
 
 	const isLoading =
 		form.formState.isSubmitting || form.formState.isLoading || isSubmitting;
@@ -72,18 +78,18 @@ function RouteComponent() {
 				},
 				onError: (ctx) => {
 					setIsSubmitting(false);
-					trackError("login_failed", { 
-						method: "email", 
+					trackError("login_failed", {
+						method: "email",
 						error: ctx.error.message,
-						email: data.email 
+						email: data.email,
 					});
 					console.error("ERROR: ", ctx.error.message);
 					toast.error("Something went wrong. Please try again.");
 				},
 			},
-		)
+		);
 		console.error({ error });
-	}
+	};
 
 	const onGoogleSignIn = async () => {
 		trackButtonClick("social_login_button", { provider: "google" });
@@ -100,14 +106,17 @@ function RouteComponent() {
 				},
 				onError: (ctx) => {
 					setIsSubmitting(false);
-					trackError("login_failed", { method: "google", error: ctx.error.message });
+					trackError("login_failed", {
+						method: "google",
+						error: ctx.error.message,
+					});
 					console.error("ERROR: ", ctx.error.message);
 					toast.error("Something went wrong. Please try again.");
 				},
 			},
-		)
+		);
 		console.error({ error });
-	}
+	};
 
 	const onGithubSignIn = async () => {
 		trackButtonClick("social_login_button", { provider: "github" });
@@ -124,14 +133,17 @@ function RouteComponent() {
 				},
 				onError: (ctx) => {
 					setIsSubmitting(false);
-					trackError("login_failed", { method: "github", error: ctx.error.message });
+					trackError("login_failed", {
+						method: "github",
+						error: ctx.error.message,
+					});
 					console.error("ERROR: ", ctx.error.message);
 					toast.error("Something went wrong. Please try again.");
 				},
 			},
-		)
+		);
 		console.error({ error });
-	}
+	};
 
 	return (
 		<section className="flex bg-zinc-50 px-4 py-16  dark:bg-transparent">
@@ -250,5 +262,5 @@ function RouteComponent() {
 				</form>
 			</Form>
 		</section>
-	)
+	);
 }

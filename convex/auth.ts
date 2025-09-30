@@ -4,7 +4,7 @@ import {
   createClient,
   GenericCtx,
 } from "@convex-dev/better-auth";
-import { anonymous, emailOTP, magicLink, twoFactor } from "better-auth/plugins";
+import { emailOTP, magicLink, twoFactor } from "better-auth/plugins";
 import { convex } from "@convex-dev/better-auth/plugins";
 import {
   sendEmailVerification,
@@ -21,7 +21,7 @@ import { v } from "convex/values";
 import { withoutSystemFields } from "convex-helpers";
 
 const authFunctions: AuthFunctions = internal.auth;
-const siteUrl = process.env.SITE_URL || process.env.VITE_SITE_URL;
+const siteUrl = process.env.SITE_URL;
 
 export const authComponent = createClient<DataModel, typeof betterAuthSchema>(
   components.betterAuth,
@@ -98,6 +98,8 @@ export const createAuth = (
       github: {
         clientId: process.env.GITHUB_CLIENT_ID as string,
         clientSecret: process.env.GITHUB_CLIENT_SECRET as string,
+        accessType: "offline",
+        prompt: "select_account consent",
       },
       google: {
         clientId: process.env.GOOGLE_CLIENT_ID as string,
@@ -114,6 +116,25 @@ export const createAuth = (
           required: false,
         },
       },
+    },
+    rateLimit: {
+      enabled: true,
+      window: 10, // time window in seconds
+      max: 100, // max requests in the window
+      customRules: {
+        "/register": {
+          window: 10, // time window in seconds
+          max: 3, // max requests in the window is 3
+        },
+        "/login": {
+          window: 10, // time window in seconds
+          max: 3, // max requests in the window is 3
+        },
+      },
+    },
+    session: {
+      expiresIn: 60 * 60 * 24 * 7, // 7 days
+      updateAge: 60 * 60 * 24, // 1 day (every 1 day the session expiration is updated)
     },
     plugins: [
       magicLink({
@@ -133,7 +154,6 @@ export const createAuth = (
         },
       }),
       twoFactor(),
-      anonymous(),
       convex(),
     ],
   });
@@ -142,11 +162,18 @@ export const createAuth = (
 // Feel free to edit, omit, etc.
 export const safeGetUser = async (ctx: QueryCtx) => {
   const authUser = await authComponent.safeGetAuthUser(ctx);
+  
   if (!authUser) {
     return;
   }
-  // Return the auth user directly since it contains all user data
-  return withoutSystemFields(authUser);
+  
+  // The authUser from Better Auth IS the user record from the user table
+  // Just return it with proper structure
+  const userWithoutSystemFields = withoutSystemFields(authUser);
+  return {
+    ...userWithoutSystemFields,
+    _id: authUser._id,
+  };
 };
 
 export const getUser = async (ctx: QueryCtx) => {

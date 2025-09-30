@@ -8,11 +8,14 @@
  * @module
  */
 
+import type * as account from "../account.js";
+import type * as accountActions from "../accountActions.js";
 import type * as auth from "../auth.js";
 import type * as betterAuth__generated_api from "../betterAuth/_generated/api.js";
 import type * as betterAuth__generated_server from "../betterAuth/_generated/server.js";
 import type * as betterAuth_adapter from "../betterAuth/adapter.js";
 import type * as betterAuth_auth from "../betterAuth/auth.js";
+import type * as constants_plans from "../constants/plans.js";
 import type * as emails_components_BaseEmail from "../emails/components/BaseEmail.js";
 import type * as emails_magicLink from "../emails/magicLink.js";
 import type * as emails_resetPassword from "../emails/resetPassword.js";
@@ -39,11 +42,14 @@ import type {
  * ```
  */
 declare const fullApi: ApiFromModules<{
+  account: typeof account;
+  accountActions: typeof accountActions;
   auth: typeof auth;
   "betterAuth/_generated/api": typeof betterAuth__generated_api;
   "betterAuth/_generated/server": typeof betterAuth__generated_server;
   "betterAuth/adapter": typeof betterAuth_adapter;
   "betterAuth/auth": typeof betterAuth_auth;
+  "constants/plans": typeof constants_plans;
   "emails/components/BaseEmail": typeof emails_components_BaseEmail;
   "emails/magicLink": typeof emails_magicLink;
   "emails/resetPassword": typeof emails_resetPassword;

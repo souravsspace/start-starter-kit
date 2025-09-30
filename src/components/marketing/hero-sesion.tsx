@@ -1,10 +1,10 @@
 import { AnimatedGroup } from "@/components/motion-primitives/animated-group";
 import { TextEffect } from "@/components/motion-primitives/text-effect";
 import { Button } from "@/components/ui/button";
+import { usePostHogTracking } from "@/hooks/use-posthog-tracking";
 import { Link } from "@tanstack/react-router";
 import { ArrowRight, ChevronRight } from "lucide-react";
 import { Icons } from "../Icons";
-import { usePostHogTracking } from "@/hooks/use-posthog-tracking";
 
 const transitionVariants = {
 	item: {
@@ -27,8 +27,8 @@ const transitionVariants = {
 };
 
 export default function HeroSection() {
-	const { trackButtonClick, trackPageView } = usePostHogTracking();
-	
+	const { trackButtonClick } = usePostHogTracking();
+
 	return (
 		<main className="overflow-hidden">
 			<div
@@ -92,7 +92,7 @@ export default function HeroSection() {
 									<span className="text-foreground text-sm">
 										Introducing Support for AI Models
 									</span>
-									<span className="dark:border-background block h-4 w-0.5 border-l bg-white dark:bg-zinc-700"></span>
+									<span className="dark:border-background block h-4 w-0.5 border-l bg-white dark:bg-zinc-700" />
 
 									<div className="bg-background group-hover:bg-muted size-6 overflow-hidden rounded-full duration-500">
 										<div className="flex w-12 -translate-x-1/2 duration-500 ease-in-out group-hover:translate-x-0">
@@ -150,7 +150,14 @@ export default function HeroSection() {
 										size="lg"
 										className="rounded-xl px-5 text-base"
 									>
-										<Link to="/auth/register" onClick={() => trackButtonClick("hero_primary_cta", { text: "Start Building" })}>
+										<Link
+											to="/auth/register"
+											onClick={() =>
+												trackButtonClick("hero_primary_cta", {
+													text: "Start Building",
+												})
+											}
+										>
 											<span className="text-nowrap">Start Building</span>
 										</Link>
 									</Button>
@@ -162,7 +169,14 @@ export default function HeroSection() {
 									variant="ghost"
 									className="h-10.5 rounded-xl px-5"
 								>
-									<Link to="/auth/register" onClick={() => trackButtonClick("hero_secondary_cta", { text: "Request a demo" })}>
+									<Link
+										to="/auth/register"
+										onClick={() =>
+											trackButtonClick("hero_secondary_cta", {
+												text: "Request a demo",
+											})
+										}
+									>
 										<span className="text-nowrap">Request a demo</span>
 									</Link>
 								</Button>

@@ -12,7 +12,7 @@ export const Route = createFileRoute("/_marketing/about")({
 function RouteComponent() {
   const { trackPageView } = usePostHogTracking();
   
-  trackPageView("about_page");
+  trackPageView({ page: "about_page" });
   return (
     <>
       <section className="py-16 md:py-32">
